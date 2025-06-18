@@ -2,7 +2,7 @@
 
 [![DOI](https://img.shields.io/badge/DOI-10.1021/acs.jpclett.3c01290-blue)](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679)  
 
-This repository contains scripts and data used in the nanoparticle section of the research paper [**Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679). 
+This repository contains scripts and data used in the research paper [**Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679). 
 
 [<img src="toc23_v2(1).png" alt="Table of Contents Figure" width="30%">](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.3c01290) 
 
