@@ -1,3 +1,5 @@
+
+```
 220124_formate_on_magnetite_slab/
 ├── 1_bond_react/                      # Bonding and reaction scripts
 ├── 1_generate_charmm_fa/               # Generate CHARMM FF for formic acid
@@ -41,3 +43,4 @@
 │   ├── 3_results/                       # Entropy results
 
 241008_trimeron_analysis/                # Additional trimeron analysis
+```
