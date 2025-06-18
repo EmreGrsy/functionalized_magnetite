@@ -1,4 +1,4 @@
-# Functionalized Magnetite Surfaces: Oxidation State Swaps
+# Functionalized Magnetite Surfaces
 
 [![DOI](https://img.shields.io/badge/DOI-10.1021/acs.jpclett.3c01290-blue)](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679)  
 
