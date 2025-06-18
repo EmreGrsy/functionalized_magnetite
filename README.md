@@ -30,8 +30,8 @@
 │   ├── 1_gen/                            
 │   ├── 2_results/                       
 
-├── 2_charge_to_extra_hydroxide/         # Extra hydroxide charge analysis
-│   ├── 3_gen_slab/                      # Slab generation scripts
+├── 2_charge_to_extra_hydroxide/         # Extra hydroxide charge analysis  (not published)
+│   ├── 3_gen_slab/                      # Slab generation scripts (not published)
 
 231214_65L_formate_ordered/              
 ├── 1_analyze_surface_slab_41L/          # Surface on 41-layer bulk (not published)
@@ -42,5 +42,5 @@
 ├── 2_entropy/                           # Entropy calculations
 │   ├── 3_results/                       # Entropy results
 
-241008_trimeron_analysis/                # Additional trimeron analysis
+241008_trimeron_analysis/                # Additional trimeron analysis (not published)
 ```
