@@ -4,11 +4,11 @@
 
 This repository contains scripts and data used in the nanoparticle section of the research paper [**Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679). 
 
-[<img src="TOC2.png" alt="Table of Contents Figure" width="30%">](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.3c01290) 
+[<img src="toc23_v2(1).png" alt="Table of Contents Figure" width="30%">](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.3c01290) 
 
 ## Overview
 
-This repository contains production and analysis scripts used in the investigation of functionalizing and analyzing magnetite 001 surface, as described in the research paper *Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**. It includes surface adsoprtion modeling, calculating binding site preferences, exploring different surface terminations with, invesitgating surface with explicit bulk regions, investigating trimerons and the entropic contribution. The repository also contains scripts for reaction pathway sampling using bond_react, which ended up not being published but shared here.
+This repository contains production and analysis scripts used in the investigation of functionalizing and analyzing magnetite 001 surface, as described in the research paper *Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States*. It includes surface adsoprtion modeling, calculating binding site preferences, exploring different surface terminations with, invesitgating surface with explicit bulk regions, investigating trimerons and the entropic contribution. The repository also contains scripts for reaction pathway sampling using bond_react, which ended up not being published but shared here.
 
 ## Repository Structure
 ```
