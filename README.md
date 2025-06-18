@@ -8,7 +8,7 @@ This repository contains scripts and data used in the nanoparticle section of th
 
 ## Overview
 
-This repository contains production and analysis scripts used in the investigation of functionalized magnetite surfaces, as described in the research paper *Oxidation-State Dynamics and Emerging Patterns in Magnetite*. It includes workflows for modeling surface adsorption of formic acid and formate ions, studying binding site preferences, exploring different surface terminations with hydroxyl groups, and analyzing the structural and electronic effects of surface functionalization. The repository also contains scripts for reaction pathway sampling using bond_react, radial distribution function (RDF) analysis, and trimeron investigations at the surface.
+This repository contains production and analysis scripts used in the investigation of functionalized magnetite surfaces, as described in the research paper *Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**. It includes workflows for modeling surface adsorption of formic acid and formate ions, studying binding site preferences, exploring different surface terminations with hydroxyl groups, and analyzing the structural and electronic effects of surface functionalization. The repository also contains scripts for reaction pathway sampling using bond_react, radial distribution function (RDF) analysis, and trimeron investigations at the surface.
 
 ## Repository Structure
 ```
