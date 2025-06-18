@@ -1,3 +1,11 @@
+# Functionalized Magnetite Surfaces: Oxidation State Swaps
+
+[![DOI](https://img.shields.io/badge/DOI-10.1021/acs.jpclett.3c01290-blue)](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679)  
+
+This repository contains scripts and data used in the nanoparticle section of the research paper [**Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679). 
+
+[<img src="TOC2.png" alt="Table of Contents Figure" width="30%">](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.3c01290) 
+
 ## Overview
 
 This repository contains production and analysis scripts used in the investigation of functionalized magnetite surfaces, as described in the research paper *Oxidation-State Dynamics and Emerging Patterns in Magnetite*. It includes workflows for modeling surface adsorption of formic acid and formate ions, studying binding site preferences, exploring different surface terminations with hydroxyl groups, and analyzing the structural and electronic effects of surface functionalization. The repository also contains scripts for reaction pathway sampling using bond_react, radial distribution function (RDF) analysis, and trimeron investigations at the surface.
