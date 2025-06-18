@@ -1,0 +1,108 @@
+variable layer index 21
+variable type string tet
+variable cover string full
+variable dl equal 1.06  # Distance between Fe_oct and Fe_tet layers. 
+variable offset equal 0.2
+variable boffset equal 12  # Simulation box offset to contain coul realspace cutoff. 
+
+variable q1 equal 1.050  # Charge of Fe(II).
+variable q2 equal 1.575  # Charge of Fe(III).
+variable q3 equal -1.050  # Charge of O.
+variable rand equal round(random(0,1e7,452345))
+
+include settings.lmp
+
+# Bulk surface.
+read_data 001-dbt_41L_bulk.data extra/bond/per/atom 3 &
+ extra/angle/per/atom 3 &
+ extra/improper/per/atom 3 &
+ group bulk
+
+include ff_formic_acid_fe304.param
+
+# Trim both ends of the 41L surface.
+# This is done to get rid of the non-bulk part.
+region bulk_excess block INF INF INF INF -21.9 4.2 side out units box
+group bulk_excess region bulk_excess
+group del_excess intersect bulk bulk_excess
+delete_atoms group del_excess
+
+# Open some space for the formate coated surface.
+group sliced_bulk type 6 7 8 9
+displace_atoms sliced_bulk move 0 0 -25 units box
+change_box all z scale 5.0
+
+# Formate coated surface.
+read_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_init.data add append group formate
+
+# For int coordination
+displace_atoms all move 0 1 0 units box
+
+set atom * image 0 0 0
+
+# All fe ions.
+group fe type 6 7 
+
+# Define fe ions in formate coated surface
+# and in bulk structure.
+group formate_fe intersect formate fe
+group bulk_fe intersect sliced_bulk fe
+
+# Reset molID 99 and use it for formate fe ions.
+set mol 99 mol 98
+set group formate_fe mol 99
+
+# Zmin and Zmax of both structures.
+variable zminformate equal bound(formate_fe,zmin)
+variable zmaxbulk equal bound(bulk_fe,zmax)
+
+# Xmax of both structures.
+variable xmaxformate equal bound(formate_fe,xmax)
+variable xmaxbulk equal bound(bulk_fe,xmax)
+
+# Ymax of both structures.
+variable ymaxformate equal bound(formate_fe,ymax)
+variable ymaxbulk equal bound(bulk_fe,ymax)
+
+# Glue both structures together.
+variable zdist equal (${zminformate}-${zmaxbulk})-${dl}
+displace_atoms sliced_bulk move 0 0 ${zdist}
+
+# Align in x direction.
+variable xdist equal ${xmaxformate}-${xmaxbulk}
+displace_atoms sliced_bulk move ${xdist} 0 0 
+
+# Align in y direction.
+variable ydist equal ${ymaxformate}-${ymaxbulk}
+displace_atoms sliced_bulk move 0 ${ydist} 0 
+
+# Pick fe ion in the bottom oct layer.
+variable boct equal bound(bulk_fe,zmin)+${offset}
+print "${boct}"
+region bottom_oct block INF INF INF INF INF ${boct} side in units box
+group bottom_oct region bottom_oct
+group fe2 type 6
+group bottom_fe2 intersect bottom_oct fe2
+
+# Charge neutrality
+#if "${cover} == full" then &
+# "set group bottom_fe2 type/subset 7 18 ${rand}" &
+# "set type 7 charge ${q2}"
+#
+#if "${cover} == half" then &
+# "set group bottom_fe2 type/subset 7 9 ${rand}" &
+# "set type 7 charge ${q2}"
+
+reset_atom_ids sort yes
+
+# Arrange simulation box.
+variable zmax equal bound(all,zmax)+${boffset}
+variable zmin equal bound(all,zmin)-${boffset}
+
+change_box all z final ${zmin} ${zmax} units box
+
+# Sanity check
+variable qtot equal charge(all)
+print "total charge of the system : ${qtot}"
+
+write_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_on_bulk_init.data

@@ -1,0 +1,10 @@
+
+	Loading module openmpi/4.1.1.
+	compiled with gcc/10.3.0
+
+
+	Loading module gcc/9.2.0.
+	This is not the standard gcc of this system -
+	possible conflicts with other applications!
+
+cp: omitting directory ‘/home/kveg/240119_formate_on_both_extra_hydrogen/2_position2/1_tet/30840’

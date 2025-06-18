@@ -1,0 +1,196 @@
+LAMMPS (10 Feb 2021)
+variable        rand equal round(random(0,1e7,452345))
+include		settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary 	   p p f
+kspace_style	   pppm 1e-6
+kspace_modify	   slab 3.0
+
+pair_style         lj/charmm/coul/long 8 12
+bond_style         harmonic
+angle_style        charmm
+dihedral_style     charmm
+improper_style     harmonic
+
+pair_modify        mix arithmetic
+special_bonds      charmm
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+
+read_data	fa_on_001_final.data
+Reading data file ...
+  orthogonal box = (0.0000000 0.0000000 0.0000000) to (8.4800000 8.4800000 100.00000)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  129 atoms
+  reading velocities ...
+  129 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  4 bonds
+  reading angles ...
+  4 angles
+  reading impropers ...
+  1 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.019 seconds
+
+include		ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass		1     12.011  # CG2O2
+mass		2      1.008  # HGR52
+mass		3    15.9994  # OG2D1
+mass		4    15.9994  # OG311
+mass		5      1.008  # HGP1
+
+pair_coeff	1  1   0.098    3.02905564168   0.098    3.02905564168  # CG2O2
+pair_coeff	2  2   0.046    1.60361769265   0.046    1.60361769265  # HGR52
+pair_coeff	3  3    0.12    3.02905564168    0.12    2.49451641079  # OG2D1
+pair_coeff	4  4  0.1921    3.14487247504  0.1921    3.14487247504  # OG311
+pair_coeff	5  5   0.046   0.400013524445   0.046   0.400013524445  # HGP1
+
+bond_coeff	1  348  1.096  # CG2O2  HGR52
+bond_coeff	2  750   1.22  # CG2O2  OG2D1
+bond_coeff	3  230    1.4  # CG2O2  OG311
+bond_coeff	4  545   0.96  # HGP1   OG311
+
+angle_coeff	1  55  115    0      0  # CG2O2  OG311  HGP1
+angle_coeff	2  39  119    0      0  # HGR52  CG2O2  OG2D1
+angle_coeff	3  47  105    0      0  # HGR52  CG2O2  OG311
+angle_coeff	4  50  123  210  2.262  # OG2D1  CG2O2  OG311
+
+dihedral_coeff	1  3.45  2  180  1  # HGP1 OG311 CG2O2 HGR52
+dihedral_coeff	2  2.05  2  180  1  # HGP1 OG311 CG2O2 OG2D1
+
+improper_coeff	1  75  0  # CG2O2 OG2D1 OG311 HGR52
+
+#####################-----magnetite-----#########################################
+
+pair_coeff      6  6   9.0298e-07  4.07222  0  0 # Fe2
+pair_coeff      7  7   9.0298e-07  4.07222  0  0 # Fe3
+pair_coeff      8  8       0.1554  3.16554  0  0 # O
+
+mass		6  55.845   # Fe2
+mass		7  55.845   # Fe3
+mass		8  15.9994  # O
+
+#####################-----formate-----###########################################
+
+mass		9     12.011   # CG2O3
+mass		10   15.9994   # OG2D2
+
+pair_coeff	9  9	0.07   3.56359487256    0.07	3.56359487256  # CG2O3
+pair_coeff	10 10	0.12   3.02905564168	0.12    3.02905564168  # OG2D2
+
+bond_coeff	5  238	1.1422  # CG2O3	HGR52
+bond_coeff	6  525	  1.26	# CG2O3 OG2D2
+
+angle_coeff	5   45	 116	0	 0  # HGR52 CG2O3 OG2D2
+angle_coeff	6  100	 128   70   2.2587  # OG2D2 CG2O3 OG2D2
+
+improper_coeff	2   67   0 # CG2O3 OG2D2 OG2D2 HGR52
+
+##############---------magnetite_bonding-------###################################
+
+pair_coeff      11 11 0.1554 3.1655 0.0 0.0     # Oh (Hydroxyl oxygen from Kerisit)
+pair_coeff      12 12 0.0 0.0 0.0 0.0           # Ho (Hydroxyl hydrogen from Kerisit)
+
+pair_coeff      13 13 9.0298e-07 4.07222  0 0   # DUMMY - Fe(III) first dummy atom
+pair_coeff      14 14 0.1554 3.1655 0.0 0.0     # DUMMY - Oh (Hydroxyl oxygen from Kerisit)
+pair_coeff      15 15 0.0 0.0 0.0 0.0           # DUMMY - Ho (Hydroxyl hydrogen from Kerisit)
+
+mass            11 15.9994 # Oh
+mass            12 1.008   # Ho
+
+mass            13 55.845  # DUMMY - Fe(III)
+mass            14 15.9994 # DUMMY - Oh
+mass            15 1.008   # DUMMY - Ho
+
+bond_coeff      7  554.1349  1.0  # Oh - Ho (CLayFF)
+
+angle_coeff     7  30.0 109.470 0 0 # FeOct - Oh - Ho (ClayFF)
+
+################################################################################################
+
+
+dump            dmp all custom 1000 swap.lammpstrj id type q x y z
+dump_modify     dmp sort id
+
+variable	x_crd equal  3.6
+variable	y_crd equal -0.8
+variable	z_crd equal 18.4
+
+group		formate_grp type 2 9 10
+4 atoms in group formate_grp
+
+# Rotate formic acid to align to tet binding site
+displace_atoms	formate_grp rotate ${x_crd} ${y_crd} ${z_crd} 0 0 1 -20
+displace_atoms	formate_grp rotate 3.6 ${y_crd} ${z_crd} 0 0 1 -20
+displace_atoms	formate_grp rotate 3.6 -0.8 ${z_crd} 0 0 1 -20
+displace_atoms	formate_grp rotate 3.6 -0.8 18.4 0 0 1 -20
+Displacing atoms ...
+
+# Formic acid center of mass- sanity check
+variable	formate_com_x equal xcm(formate_grp,x)
+variable        formate_com_y equal xcm(formate_grp,y)
+variable        formate_com_z equal xcm(formate_grp,z)
+
+displace_atoms	formate_grp move -1.78 -2.137 0.0
+Displacing atoms ...
+
+print		"Formic acid molecule center of mess: {${formate_com_x}, ${formate_com_y}, ${formate_com_z}}"
+Formic acid molecule center of mess: {1.40519266127583, -2.80822661797631, 18.3395996931701}
+write_data	fa_on_001_rotated.data
+System init for write_data ...
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:339)
+  G vector (1/distance) = 0.28920668
+  grid = 15 15 192
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00032408823
+  estimated relative force accuracy = 9.7598207e-07
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 112320 43200
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 2 2 15
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/charmm/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d/newton
+      bin: standard
+
+set		atom * image 0 0 0
+Setting atom values ...
+  129 settings made for image
+write_data	fa_on_001_wrapped.data
+System init for write_data ...
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:339)
+  G vector (1/distance) = 0.28920668
+  grid = 15 15 192
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00032408823
+  estimated relative force accuracy = 9.7598207e-07
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 112320 43200
+Total wall time: 0:00:00

@@ -1,0 +1,112 @@
+variable temp index 3000 4000 5000 6000 7000 8000 9000
+
+variable rand equal round(random(0,1e7,452345))
+variable ns equal 2000000
+include settings.lmp
+
+#variable layer string 33
+#variable type string int
+#variable coverage string full
+
+read_data 001-dbt_3x3_${layer}L_fa_${type}_${coverage}_qeq.data
+
+dump dmp all custom 10000 swap.lammpstrj id mol type q x y z
+dump_modify dmp sort id
+
+group fe type 7 6
+
+# Evaluate the lowest Tmc yielding swaps
+label sample_Tmc
+
+    variable ftemp equal v_temp
+    print "${ftemp}"
+
+    fix nvt all nvt temp 300.0 300.0 1
+    fix swp fe atom/swap 1 1 ${rand} ${temp} ke no types 7 6
+    velocity all create 300.0 ${rand} rot yes mom yes dist gaussian
+    thermo_style custom step temp pe v_ftemp f_swp[1] f_swp[2]
+    thermo 100
+    variable nswp equal f_swp[2]
+    run 100
+    unfix nvt
+
+    if "${nswp}>0" then &
+     "print '${nswp}'" &
+     "variable Tmc equal ${temp}" &
+     "jump SELF break"
+
+    unfix swp
+
+next temp
+jump SELF sample_Tmc
+label break
+
+undump dump
+
+# Tmc (i) without swap, (ii) min swap, (iii) more then min swap
+variable tmc index 300 ${Tmc} $(v_Tmc + 5000)
+
+# Production MC
+label production_MC
+
+    clear
+
+    include settings.lmp
+    read_data 001-dbt_3x3_${layer}L_fa_${type}_${coverage}_qeq.data
+
+    group fe type 7 6
+    group c type 1
+
+    # Required for fix/ave file naming
+    variable vlayer equal v_layer
+    variable vtype equal v_type
+    variable vcoverage equal v_coverage
+    variable vtmc equal v_tmc
+
+    # Calculate Fe coordination (tet, oct)
+    compute coord fe coord/atom cutoff 2.0
+    dump coord fe custom 1 fe_${layer}L.coord id type c_coord
+    dump_modify coord sort id
+    run 0
+    variable fet atom c_coord==4
+    group fet variable fet
+    group feo subtract fe fet
+    undump coord
+
+    # Calculate formate binding site (tet, int)
+    compute coord1 c coord/atom cutoff 5.0
+    dump coord1 c custom 1 c_${layer}L.coord id type c_coord1
+    dump_modify coord1 sort id
+    run 0
+    variable ctet atom c_coord1>=1
+    group ctet variable ctet
+    group cint subtract c ctet
+    undump coord1
+
+    variable nctet equal count(ctet)
+    variable ncint equal count(cint)
+    variable pe equal pe
+
+    reset_timestep 0
+
+    fix nvt all nvt temp 300.0 300.0 1
+    fix swp fe atom/swap 1 1 ${rand} ${tmc} ke no types 7 6
+    fix ave all ave/time 10 1 100 v_vlayer v_vtype v_vcoverage v_pe &
+        v_vtmc v_nctet v_ncint f_swp[1] f_swp[2] &
+        ave one file ${vlayer}_${vtype}_${vcoverage}_${vtmc}.txt
+    velocity all create 300.0 ${rand} rot yes mom yes dist gaussian
+    thermo 100
+    thermo_style custom step temp pe v_vtmc f_swp[1] f_swp[2] v_nctet v_ncint
+    run	100
+
+    unfix ave
+    unfix nvt
+    unfix swp
+
+    thermo_style one
+    write_data 001-dbt_3x3_${layer}L_fa_${type}_${coverage}_qeq_Tmc_${tmc}K.data
+
+next tmc
+jump SELF production_MC
+
+quit

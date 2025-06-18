@@ -1,0 +1,5 @@
+# After Formic acid deprotonation to Formate, excess hydrogen binds to the closest oxygen, but DFT calculations shows that this was not the case,
+
+inorder to solve this discrepancy, formate molecule's center of mass was shifted to the neighbouring binding site to be consistant with DFT calculation.
+
+For ease 2. and 3. part of this folders where taken from *tet* calculations so they are here to be a guide. 

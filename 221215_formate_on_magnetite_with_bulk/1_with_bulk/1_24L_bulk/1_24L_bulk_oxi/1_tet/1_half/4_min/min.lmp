@@ -1,0 +1,41 @@
+variable layer index 21
+variable type string fa_tet_half_qeq
+variable rand equal round(random(0,1e7,452345))
+variable temp index 50000 45000 40500 36450 32805 29524 26571 23913 21521 19368 17431 15687 14118 12706 11435 10291 9261 8334 7500 6750 6075 5467 4920 4428 3985 3586 3227 2904 2613 2351 2115 1903 1712 1540 1386 1247 1122 1009 908 817 735 661 594 534 480 432 388 349 314 282 253 227 204 183 164 147 132 118 106 95 85 76 68 61 54 48 43 38 34 30 27 24 21 18 16 14 12 10 9 8 7 6 5 4 3 2 1
+variable nsteps equal 324  # (nfe*nfe)/4
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+
+include ff_formic_acid_fe304.param
+
+group Fe type 6 7
+
+region bottomFe block INF INF INF INF INF -28.5
+group bottomFe region bottomFe
+group bFe intersect bottomFe Fe
+
+
+label minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp bFe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+write_data 001-dbt_3x3_${layer}L_${type}_lqeq.data
+
+# Full minimization
+minimize 1.0e-6 1.0e-9 1000 10000
+
+write_data 001-dbt_3x3_${layer}L_${type}_lqeq_min.data

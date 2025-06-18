@@ -1,0 +1,31 @@
+variable        rand equal round(random(0,1e7,452345))
+include		settings.lmp
+
+read_data	fa_on_001_final.data
+
+include		ff_formic_acid_fe304.param
+
+dump            dmp all custom 1000 swap.lammpstrj id type q x y z
+dump_modify     dmp sort id
+
+variable	x_crd equal  3.6
+variable	y_crd equal -0.8
+variable	z_crd equal 18.4
+
+group		formate_grp type 2 9 10
+
+# Rotate formic acid to align to tet binding site 
+displace_atoms	formate_grp rotate ${x_crd} ${y_crd} ${z_crd} 0 0 1 -20
+
+# Formic acid center of mass- sanity check
+variable	formate_com_x equal xcm(formate_grp,x)
+variable        formate_com_y equal xcm(formate_grp,y)
+variable        formate_com_z equal xcm(formate_grp,z)
+
+displace_atoms	formate_grp move -1.78 -2.137 0.0
+
+print		"Formic acid molecule center of mess: {${formate_com_x}, ${formate_com_y}, ${formate_com_z}}"
+write_data	fa_on_001_rotated.data
+
+set		atom * image 0 0 0
+write_data	fa_on_001_wrapped.data

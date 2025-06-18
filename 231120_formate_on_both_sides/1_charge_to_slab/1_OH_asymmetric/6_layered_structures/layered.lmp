@@ -1,0 +1,80 @@
+# type 7 Fe3+, type 6 Fe2+
+variable 17_full_lyr index 1 1 1 0 1 0 1 1 1
+variable 25_full_lyr index 1 1 1 0 1 0 1 0 1 0 1 1 1
+variable 33_full_lyr index 1 1 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1
+variable 41_full_lyr index 1 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1
+variable 49_full_lyr index 1 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1
+
+###### Change part and a part at the bottom #######################
+variable layer equal 17
+variable coverage string full
+variable binding_site string int
+
+####################################################
+variable rand equal round(random(0,1e7,452345))
+variable offset equal 0.5
+variable doct equal 2.12  # Distance betweeen Fe_oct layers.
+
+variable q2 equal 1.050  # Charge of Fe(II).
+variable q3 equal 1.575  # Charge of Fe(III).
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_fa_${binding_site}_${coverage}_qeq.data
+
+include ff_formic_acid_fe304.param
+
+group fe type 6 7 
+
+variable oct_layer equal (${layer}+1)/2
+variable oct_layer_loop loop ${oct_layer}
+
+variable top_oct equal bound(fe,zmax)
+
+variable top_oct_zmax equal ${top_oct}+${offset}
+variable top_oct_zmin equal ${top_oct}-${offset}
+
+label assign_group
+
+    region fe_block block INF INF INF INF ${top_oct_zmin} ${top_oct_zmax} side in units box
+    group fe_block region fe_block
+    group ${oct_layer_loop} intersect fe fe_block # Fe oct atoms.
+    
+    group fe_block delete
+    region fe_block delete 
+
+    variable top_oct_zmax equal ${top_oct_zmax}-${doct}
+    variable top_oct_zmin equal ${top_oct_zmin}-${doct}
+
+next oct_layer_loop
+jump SELF assign_group
+
+# loop variable for oct layers
+variable l equal 0
+
+label assign_charge
+
+    variable l equal ${l}+1
+
+    # Change this part
+    # Fe3+
+    if "${17_full_lyr} == 1" then &
+        "set group ${l} type 7" &
+        "set group ${l} charge ${q3}" 
+        #"print '${l} layer with Fe3+'"
+
+    # Fe2+
+    if "${17_full_lyr} == 0" then &
+        "set group ${l} type 6" &
+        "set group ${l} charge ${q2}"
+        #"print '${l}th layer with Fe2+'"
+
+# Change this part
+next 17_full_lyr
+jump SELF assign_charge
+
+# Sanity check
+variable qtot equal charge(all)
+print "total charge of the system : ${qtot}"
+
+write_data 001-dbt_3x3_${layer}L_fa_${binding_site}_${coverage}_layered.data

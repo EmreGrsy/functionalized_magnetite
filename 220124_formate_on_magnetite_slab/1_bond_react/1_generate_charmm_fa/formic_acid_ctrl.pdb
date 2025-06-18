@@ -1,0 +1,10 @@
+REMARK  
+REMARK  CONTROL PDB formic_acid_ctrl.pdb
+REMARK  CREATED BY charmm2lammps v1.9.2 ON Do 3. Feb 15:23:11 CET 2022
+REMARK  
+ATOM      1  C   FOR     1      -0.452  -0.014       0  1.00   0.0      A   
+ATOM      2  H   FOR     1      -1.292  -0.556       0  1.00   0.0      A   
+ATOM      3  O2  FOR     1      -0.742   1.164       0  1.00   0.0      A   
+ATOM      4  O1  FOR     1        0.84  -0.491       0  1.00   0.0      A   
+ATOM      5  HO1 FOR     1       1.473   0.283       0  1.00   0.0      A   
+END

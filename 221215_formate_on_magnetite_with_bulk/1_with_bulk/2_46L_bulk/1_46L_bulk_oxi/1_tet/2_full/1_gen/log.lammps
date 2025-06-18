@@ -1,0 +1,435 @@
+LAMMPS (17 Feb 2022)
+variable layer index 21
+variable type string tet
+variable cover string full
+variable dl equal 1.06  # Distance between Fe_oct and Fe_tet layers.
+variable octoct equal 2*${dl} # Distance betweeen Fe_oct Fe_oct layers.
+variable octoct equal 2*1.06 
+variable offset equal 0.2
+variable boffset equal 12  # Simulation box offset that corresponds to coulumb realspace cutoff.
+
+variable q1 equal 1.050  # Charge of Fe(II).
+variable q2 equal 1.575  # Charge of Fe(III).
+variable q3 equal -1.050  # Charge of O.
+variable rand equal round(random(0,1e7,452345))
+
+include settings_noKspace.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/cut 12.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+
+# Bulk surface.
+read_data 001-dbt_41L_bulk.data extra/bond/per/atom 3  extra/angle/per/atom 3  extra/improper/per/atom 3  group bulk
+Reading data file ...
+  orthogonal box = (0 0 -37.2184) to (25.44 25.44 29.2552)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  2628 atoms
+  reading velocities ...
+  2628 velocities
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     0 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     1 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.025 seconds
+
+include ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass  1   12.011   # Sp2 C carbonyl group
+mass  2    1.008   # H bonded to non-sp3 carbon with 2 electrwd. group
+mass  3   15.9994  # Oxygen with one connected atom
+mass  4   15.9994  # Oxygen in hydroxyl group
+mass  5    1.008   # Hydroxyl group
+
+pair_coeff  1  1   0.0988  3.31521230994  # c
+pair_coeff  2  2   0.0161  2.44729877873  # h5
+pair_coeff  3  3   0.1463  3.04812087425  # o
+pair_coeff  4  4   0.0930  3.24287133403  # oh
+pair_coeff  5  5   0.0047  0.537924646013 # ho
+
+bond_coeff  1  361.80  1.105  # c-h5
+bond_coeff  2  652.57  1.218  # c=o
+bond_coeff  3  383.13  1.351  # c-oh
+bond_coeff  4  563.51  0.973  # o-h
+
+angle_coeff  1   51.617  106.550  # c-oh-ho
+angle_coeff  2   65.930  123.650  # h5-c=o
+angle_coeff  3   65.262  109.490  # h5-c-oh
+angle_coeff  4  115.745  122.100  # o=c-oh
+
+dihedral_coeff  1  1  2.3  2  180.0               # h5-c-oh-ho
+dihedral_coeff  2  2  2.3  2  180.0  1.9  1  0.0  # o=c-oh-ho
+
+                              #  h5
+                              #  |
+improper_coeff  1  10.5 -1 2  #  c
+                              # / \
+                              # o  oh
+
+#####################-----formate-----###########################################
+
+angle_coeff  5   118.817 130.250  # o-c-o
+
+                              #  h5
+                              #  |
+improper_coeff  2  10.5 -1 2  #  c
+                              # / \
+                              # o  o
+
+#####################-----magnetite-----#########################################
+
+mass  6   55.845   # Iron(II)
+mass  7   55.845   # Iron(III)
+mass  8   15.9994  # Bridging oxygen
+mass  9   15.9994  # Hydroxyl oxygen
+mass  10   1.008   # Hydroxyl hydrogen
+
+pair_coeff  6  6   9.0298e-07  4.90620  # fe2
+pair_coeff  7  7   9.0298e-07  4.90620  # fe3
+pair_coeff  8  8   0.1554      3.16554  # ob
+pair_coeff  9  9   0.1554      3.16554  # oh
+pair_coeff  10 10  0.0         0.0      # ho
+
+bond_coeff  5  554.1349  1.0   # oh-ho
+bond_coeff  6    0.0     2.08  # fe-oh (dummy bond)
+
+angle_coeff  6   30.0  109.470  # fe-oh-ho
+
+##################################################################################
+
+group fe type 6 7
+1116 atoms in group fe
+
+# Erase the non-bulk part.
+region bulk_excess block INF INF INF INF -21.9 4.2 side out units box
+group bulk_excess region bulk_excess
+1116 atoms in group bulk_excess
+group del_excess intersect bulk bulk_excess
+1116 atoms in group del_excess
+delete_atoms group del_excess
+WARNING: Ignoring 'compress yes' for molecular system (../delete_atoms.cpp:126)
+Deleted 1116 atoms, new total = 1512
+
+reset_atom_ids
+Resetting atom IDs ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 4 4 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     0 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     1 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+# Sanity check
+variable qtot equal charge(all)
+print "total charge of the system : ${qtot}"
+total charge of the system : -9.99200722162641e-14
+
+replicate 1 1 2
+Replicating atoms ...
+WARNING: Replicating in a non-periodic dimension (../replicate.cpp:73)
+  orthogonal box = (0 0 -37.2184) to (25.44 25.44 95.7288)
+  1 by 1 by 1 MPI processor grid
+  3024 atoms
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     0 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     1 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  replicate CPU = 0.004 seconds
+
+# Define the regions of replicated bulks.
+region top_bulk block INF INF INF INF 40 75 side in units box
+region bottom_bulk block INF INF INF INF -25 15 side in units box
+
+group top_bulk region top_bulk
+1512 atoms in group top_bulk
+group bottom_bulk region bottom_bulk
+1512 atoms in group bottom_bulk
+
+group top_bulk_fe intersect top_bulk fe
+648 atoms in group top_bulk_fe
+group bottom_bulk_fe intersect bottom_bulk fe
+648 atoms in group bottom_bulk_fe
+
+variable top_bulk_min equal bound(top_bulk_fe,zmin)
+variable bottom_bulk_top equal bound(bottom_bulk_fe,zmax)
+
+variable dist_bulk equal ${top_bulk_min}-${bottom_bulk_top}
+variable dist_bulk equal 45.532013-${bottom_bulk_top}
+variable dist_bulk equal 45.532013-3.43841299999999
+variable dist_move equal ${dist_bulk}-${dl}
+variable dist_move equal 42.0936-${dl}
+variable dist_move equal 42.0936-1.06
+
+# Combine replicated bulks.
+displace_atoms bottom_bulk move 0 0 ${dist_move}
+displace_atoms bottom_bulk move 0 0 41.0336
+Displacing atoms ...
+
+# Erase 2 bottom layers.
+variable bottom_bulk_min equal bound(bottom_bulk_fe,zmin)
+variable bottom_del equal ${bottom_bulk_min}+1.53
+variable bottom_del equal 20.092013+1.53
+#
+region bottom_del block INF INF INF INF ${bottom_del} INF side out units box
+region bottom_del block INF INF INF INF 21.622013 INF side out units box
+group bottom_del region bottom_del
+126 atoms in group bottom_del
+#group del_excess intersect bulk bulk_excess
+delete_atoms group bottom_del
+WARNING: Ignoring 'compress yes' for molecular system (../delete_atoms.cpp:126)
+Deleted 126 atoms, new total = 2898
+
+group bulk delete
+
+# Open some space for the formate coated surface.
+group bulk type 6 7 8 9
+2898 atoms in group bulk
+displace_atoms bulk move 0 0 -200 units box
+Displacing atoms ...
+change_box all z scale 5.0
+Changing box ...
+  orthogonal box = (0 0 -303.1128) to (25.44 25.44 361.6232)
+
+# Formate surface.
+read_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_init.data add append group formate
+read_data 001-dbt_3x3_21L_fa_${type}_${cover}_init.data add append group formate
+read_data 001-dbt_3x3_21L_fa_tet_${cover}_init.data add append group formate
+read_data 001-dbt_3x3_21L_fa_tet_full_init.data add append group formate
+Reading data file ...
+  orthogonal box = (0 0 -303.1128) to (25.44 25.44 361.6232)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  1458 atoms
+  reading velocities ...
+  1458 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  72 bonds
+  reading angles ...
+  108 angles
+  reading impropers ...
+  18 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.021 seconds
+
+# To avoid stretching bonds at int sites.
+displace_atoms all move 0 1 0 units box
+Displacing atoms ...
+
+set atom * image 0 0 0
+Setting atom values ...
+  4356 settings made for image
+
+# All fe ions.
+group fe type 6 7
+1818 atoms in group fe
+
+group formate_fe intersect formate fe
+576 atoms in group formate_fe
+group bulk_fe intersect bulk fe
+1242 atoms in group bulk_fe
+
+# Reset molID 99 and use it for formate fe ions.
+set mol 99 mol 98
+Setting atom values ...
+  0 settings made for mol
+set group formate_fe mol 99
+Setting atom values ...
+  576 settings made for mol
+
+##
+## Align combined system
+##
+
+# Zmin and Zmax.
+variable zminformate equal bound(formate_fe,zmin)
+variable zmaxbulk equal bound(bulk_fe,zmax)
+
+# Xmax.
+variable xmaxformate equal bound(formate_fe,xmax)
+variable xmaxbulk equal bound(bulk_fe,xmax)
+
+# Ymax.
+variable ymaxformate equal bound(formate_fe,ymax)
+variable ymaxbulk equal bound(bulk_fe,ymax)
+
+# Combine formate surface region and bulk region.
+variable zdist equal (${zminformate}-${zmaxbulk})-${dl}
+variable zdist equal (-3.98158700000001-${zmaxbulk})-${dl}
+variable zdist equal (-3.98158700000001--130.087987)-${dl}
+variable zdist equal (-3.98158700000001--130.087987)-1.06
+displace_atoms bulk move 0 0 ${zdist}
+displace_atoms bulk move 0 0 125.0464
+Displacing atoms ...
+
+# Align x-axis.
+variable xdist equal ${xmaxformate}-${xmaxbulk}
+variable xdist equal 24.461178-${xmaxbulk}
+variable xdist equal 24.461178-24.638417
+displace_atoms bulk move ${xdist} 0 0
+displace_atoms bulk move -0.177239 0 0
+Displacing atoms ...
+
+# Align y-axis.
+variable ydist equal ${ymaxformate}-${ymaxbulk}
+variable ydist equal 24.59944-${ymaxbulk}
+variable ydist equal 24.59944-24.578417
+displace_atoms bulk move 0 ${ydist} 0
+displace_atoms bulk move 0 0.0210229999999996 0
+Displacing atoms ...
+
+##
+## Middle region oxidation
+##
+
+# Pick fe ions in middle0
+variable middle0 equal bound(bulk_fe,zmin)+10*${octoct}
+variable middle0 equal bound(bulk_fe,zmin)+10*2.12
+variable min_middle0 equal ${middle0}-0.5
+variable min_middle0 equal -31.541587-0.5
+variable max_middle0 equal ${middle0}+0.5
+variable max_middle0 equal -31.541587+0.5
+region middle0 block INF INF INF INF ${min_middle0} ${max_middle0} side in units box
+region middle0 block INF INF INF INF -32.041587 ${max_middle0} side in units box
+region middle0 block INF INF INF INF -32.041587 -31.041587 side in units box
+group middle0 region middle0
+108 atoms in group middle0
+set group middle0 mol 100
+Setting atom values ...
+  108 settings made for mol
+
+# Pick fe ions in middle1
+variable middle1 equal bound(bulk_fe,zmin)+11*${octoct}
+variable middle1 equal bound(bulk_fe,zmin)+11*2.12
+variable min_middle1 equal ${middle1}-0.5
+variable min_middle1 equal -29.421587-0.5
+variable max_middle1 equal ${middle1}+0.5
+variable max_middle1 equal -29.421587+0.5
+region middle1 block INF INF INF INF ${min_middle1} ${max_middle1} side in units box
+region middle1 block INF INF INF INF -29.921587 ${max_middle1} side in units box
+region middle1 block INF INF INF INF -29.921587 -28.921587 side in units box
+group middle1 region middle1
+108 atoms in group middle1
+set group middle1 mol 101
+Setting atom values ...
+  108 settings made for mol
+
+# Pick fe ions in middle2
+variable middle2 equal bound(bulk_fe,zmin)+12*${octoct}
+variable middle2 equal bound(bulk_fe,zmin)+12*2.12
+variable min_middle2 equal ${middle2}-0.5
+variable min_middle2 equal -27.301587-0.5
+variable max_middle2 equal ${middle2}+0.5
+variable max_middle2 equal -27.301587+0.5
+region middle2 block INF INF INF INF ${min_middle2} ${max_middle2} side in units box
+region middle2 block INF INF INF INF -27.801587 ${max_middle2} side in units box
+region middle2 block INF INF INF INF -27.801587 -26.801587 side in units box
+group middle2 region middle2
+108 atoms in group middle2
+set group middle2 mol 102
+Setting atom values ...
+  108 settings made for mol
+
+# Pick middle1 for oxidation state swaps
+group fe2 type 6
+558 atoms in group fe2
+group bottom_fe2 intersect middle1 fe2
+18 atoms in group bottom_fe2
+
+# Charge neutrality
+if "${cover} == full" then  "set group bottom_fe2 type/subset 7 18 ${rand}"  "set type 7 charge ${q2}"
+set group bottom_fe2 type/subset 7 18 ${rand}
+set group bottom_fe2 type/subset 7 18 855824
+Setting atom values ...
+  18 settings made for type/subset
+set type 7 charge ${q2}
+set type 7 charge 1.575
+Setting atom values ...
+  1278 settings made for charge
+
+if "${cover} == half" then  "set group bottom_fe2 type/subset 7 9 ${rand}"  "set type 7 charge ${q2}"
+
+reset_atom_ids sort yes
+Resetting atom IDs ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+
+# Rearange simulation box.
+variable zmax equal bound(all,zmax)+${boffset}
+variable zmax equal bound(all,zmax)+12
+variable zmin equal bound(all,zmin)-${boffset}
+variable zmin equal bound(all,zmin)-12
+
+change_box all z final ${zmin} ${zmax} units box
+change_box all z final -64.778423 ${zmax} units box
+change_box all z final -64.778423 32.908 units box
+Changing box ...
+  orthogonal box = (0 0 -64.778423) to (25.44 25.44 32.908)
+
+# Sanity check
+variable qtot equal charge(all)
+print "total charge of the system : ${qtot}"
+total charge of the system : -4.44144721001294e-13
+
+write_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_on_46bulk_init.data
+write_data 001-dbt_3x3_21L_fa_${type}_${cover}_on_46bulk_init.data
+write_data 001-dbt_3x3_21L_fa_tet_${cover}_on_46bulk_init.data
+write_data 001-dbt_3x3_21L_fa_tet_full_on_46bulk_init.data
+System init for write_data ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Total wall time: 0:00:00

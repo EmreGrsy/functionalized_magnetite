@@ -1,0 +1,42 @@
+variable        rand equal round(random(0,1e7,452345))
+include		settings.lmp
+
+
+read_data	001-dbt_17_swp_0K.data &
+                extra/bond/per/atom 4 &
+                extra/angle/per/atom 4 &
+                extra/dihedral/per/atom 2 &
+                extra/improper/per/atom 1 &
+		extra/special/per/atom 5
+
+include		ff_formic_acid_fe304.param
+molecule	formic_acid formic_acid_molecule.template
+
+dump            dmp all custom 1000 swap.lammpstrj id type q x y z
+dump_modify     dmp sort id
+
+change_box	all z final 0 100 
+
+region		formate_box block INF INF INF INF 20 23 units box side in
+
+# Formic acid coordinate decleration
+variable	x_crd equal 5.5
+variable	y_crd equal 1.3
+variable	z_crd equal 22
+
+create_atoms	0 single ${x_crd} ${y_crd} ${z_crd} mol formic_acid ${rand} 
+
+group		formate_grp type 1 2 3 4 5
+
+# Rotate formic acid to align to tet binding site 
+displace_atoms	formate_grp rotate ${x_crd} ${y_crd} ${z_crd} 0 0 1 100
+
+# Formic acid center of mass- sanity check
+variable	formate_com_x equal xcm(formate_grp,x)
+variable        formate_com_y equal xcm(formate_grp,y)
+variable        formate_com_z equal xcm(formate_grp,z)
+
+print		"Formate molecule was created at {5, 5, 20} coordinate"
+print		"Formic acid molecule center of mess: {${formate_com_x}, ${formate_com_y}, ${formate_com_z}}"
+
+write_data	fa_on_001_17L.data

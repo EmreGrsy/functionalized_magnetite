@@ -1,0 +1,63 @@
+variable layer index 21
+variable type string fa_tet_half_qeq
+variable rand equal round(random(0,1e7,452345))
+variable temp index 50000 45000 40500 36450 32805 29524 26571 23913 21521 19368 17431 15687 14118 12706 11435 10291 9261 8334 7500 6750 6075 5467 4920 4428 3985 3586 3227 2904 2613 2351 2115 1903 1712 1540 1386 1247 1122 1009 908 817 735 661 594 534 480 432 388 349 314 282 253 227 204 183 164 147 132 118 106 95 85 76 68 61 54 48 43 38 34 30 27 24 21 18 16 14 12 10 9 8 7 6 5 4 3 2 1
+variable nsteps equal 324  # (nfe*nfe)/4
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+
+include ff_formic_acid_fe304.param
+
+# Bottom oct_layer
+group bLayerFe3 id 319 249 339 192 198 142 212 99 22  # Fe3+ -> Fe2+
+
+# One oct above bottom oct_layer
+group bLayerFe2 id 8 358 73 48 118 288 318 268 43  # Fe2+ -> Fe3+
+
+# Two oct above bottom oct_layer
+#group bLayerFe2 id 13 33 87 203 223 323 177 297 343 # Fe2+ -> Fe3+
+
+set group bLayerFe3 type 6
+set group bLayerFe3 charge 1.05
+
+set group bLayerFe2 type 7
+set group bLayerFe2 charge 1.575
+
+group Fe type 6 7
+
+region bottomFe block INF INF INF INF INF -28.5
+group bottomFe region bottomFe 
+group bFe intersect bottomFe Fe
+
+region bottom1Fe block INF INF INF INF -27.8 -26.5
+group bottom1Fe region bottom1Fe
+group b1Fe intersect bottom1Fe Fe
+
+#region bottom2Fe block INF INF INF INF -25.5 -25
+#group bottom2Fe region bottom2Fe
+#group b2Fe intersect bottom2Fe Fe
+
+label minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b1Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+read_data 001-dbt_3x3_${layer}L_${type}_lqeq.data
+
+# Full minimization
+minimize 1.0e-6 1.0e-9 1000 10000
+
+write_data 001-dbt_3x3_${layer}L_${type}_lqeq_min.data

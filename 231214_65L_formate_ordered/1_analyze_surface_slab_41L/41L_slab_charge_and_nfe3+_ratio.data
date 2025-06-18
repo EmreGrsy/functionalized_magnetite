@@ -1,0 +1,83 @@
+nlayer coord charge
+1 oct -18.900
+2 tet 28.350
+## tot_charge (oct+tet) layer: 9.450
+## nfe_oct3+ - nfe_oct2+  : 36 - 0
+3 oct -22.575
+4 tet 28.350
+## tot_charge (oct+tet) layer: 5.775
+## nfe_oct3+ - nfe_oct2+  : 29 - 7
+5 oct -27.825
+6 tet 27.825
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 19 - 17
+7 oct -29.400
+8 tet 28.350
+## tot_charge (oct+tet) layer: -1.050
+## nfe_oct3+ - nfe_oct2+  : 16 - 20
+9 oct -28.350
+10 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+11 oct -28.350
+12 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+13 oct -28.350
+14 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+15 oct -28.350
+16 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+17 oct -28.350
+18 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+19 oct -28.350
+20 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+21 oct -28.350
+22 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+23 oct -28.350
+24 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+25 oct -28.350
+26 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+27 oct -28.350
+28 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+29 oct -28.350
+30 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+31 oct -28.350
+32 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+33 oct -28.350
+34 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+35 oct -28.350
+36 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+37 oct -28.350
+38 tet 28.350
+## tot_charge (oct+tet) layer: 0.000
+## nfe_oct3+ - nfe_oct2+  : 18 - 18
+39 oct -21.525
+40 tet 28.350
+## tot_charge (oct+tet) layer: 6.825
+## nfe_oct3+ - nfe_oct2+  : 31 - 5
+41 oct -18.900
+## tot_charge (oct) : -18.900

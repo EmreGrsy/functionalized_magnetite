@@ -1,0 +1,9 @@
+REMARK  
+REMARK  CONTROL PDB formate_ctrl.pdb
+REMARK  CREATED BY charmm2lammps v1.9.2 ON Fr 4. Feb 16:36:30 CET 2022
+REMARK  
+ATOM      1  C1  FOR     1       0.258   1.164       0  1.00   0.0      A   
+ATOM      2  O2  FOR     1      -0.742   1.164       0  1.00   0.0      A   
+ATOM      3  O3  FOR     1       0.758    2.03       0  1.00   0.0      A   
+ATOM      4  H4  FOR     1       0.758   0.298       0  1.00   0.0      A   
+END

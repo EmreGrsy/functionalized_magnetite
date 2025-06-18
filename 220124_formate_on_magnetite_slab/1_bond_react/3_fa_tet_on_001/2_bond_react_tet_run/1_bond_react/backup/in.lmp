@@ -1,0 +1,69 @@
+variable	q3 equal 1.575
+variable        rand equal round(random(0,1e7,452345))
+include         settings.lmp
+
+read_data       fa_on_001_17L_nvt100K.data 
+
+include         ff_formic_acid_fe304.param
+
+molecule	mol1 rxn1_pre.data
+molecule	mol2 rxn1_post.data
+molecule	mol3 rxn2_pre.data
+molecule	mol4 rxn2_post.data
+molecule	mol5 rxn3_pre.data
+molecule	mol6 rxn3_post.data
+
+dump            dmp all custom 20 swap.lammpstrj id type q x y z
+dump_modify     dmp sort id
+
+#########-------------bond react------###################################################
+fix             rxns all bond/react stabilization yes statted_grp .01 &
+                react rxn1 all 1 1.7 5.0 mol1 mol2 rxn1.map stabilize_steps 0 &
+		react rxn2 all 1 1.7 5.0 mol3 mol4 rxn2.map stabilize_steps 0 &
+		react rxn3 all 1 1.7 5.0 mol5 mol6 rxn3.map max_rxn 3
+
+thermo          1
+thermo_style    custom step temp pe f_rxns[1] f_rxns[2] f_rxns[3]
+run             160
+
+write_data	fa_on_001_bond_react_1.data
+
+
+######-----delete unwanted dihedral atoms, this is an error---##############################
+delete_bonds	all dihedral 1 remove
+delete_bonds	all dihedral 2 remove
+
+unfix		rxns
+#####----------making system charge neutral by changing 1 inner lattice Fe(II) to Fe(III)------#########
+region          inner block INF INF INF INF 11.0 13.5 units box
+group           fe2 type 6
+variable        fe2_i atom grmask(fe2,inner)
+group           fe2_in variable fe2_i
+
+set             group fe2_in type/subset 7 1 ${rand}
+set             type 7 charge ${q3}
+
+group           fe2 delete
+group           fe2_in delete
+
+variable        qtot equal charge(all)
+print           "total charge of the system : ${qtot}"
+
+#####----------electrostatic relaxation with mc swaps--------------########
+group           Fe type 7 6
+fix             swp Fe atom/swap 1 100 ${rand} 0.0 types 6 7
+velocity        all create 0.0 ${rand} rot yes mom yes dist gaussian
+thermo          1000
+thermo_style    custom step temp pe f_swp[1] f_swp[2]
+run             10000
+unfix           swp
+group           Fe delete
+
+######--------system wide relaxation---------########################
+fix             nve all nve
+thermo          1000
+thermo_style    custom step temp pe
+run             40000
+
+unfix		nve
+write_data      fa_on_001_nve_2.data

@@ -1,0 +1,291 @@
+LAMMPS (17 Feb 2022)
+variable layer index 21
+variable type string tet
+variable cover string half
+variable offset equal 0.2
+
+include settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/long 26.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+kspace_style       pppm 1.0e-6
+kspace_modify      slab 3.0
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       one 10000
+neigh_modify       every 1 delay 0 check yes
+
+read_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_on_bulk_init.data
+read_data 001-dbt_3x3_21L_fa_${type}_${cover}_on_bulk_init.data
+read_data 001-dbt_3x3_21L_fa_tet_${cover}_on_bulk_init.data
+read_data 001-dbt_3x3_21L_fa_tet_half_on_bulk_init.data
+Reading data file ...
+  orthogonal box = (0 0 -41.458422) to (25.44 25.44 32.908)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  2925 atoms
+  reading velocities ...
+  2925 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  36 bonds
+  reading angles ...
+  54 angles
+  reading impropers ...
+  9 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.009 seconds
+
+include ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass  1   12.011   # Sp2 C carbonyl group
+mass  2    1.008   # H bonded to non-sp3 carbon with 2 electrwd. group
+mass  3   15.9994  # Oxygen with one connected atom
+mass  4   15.9994  # Oxygen in hydroxyl group
+mass  5    1.008   # Hydroxyl group
+
+pair_coeff  1  1   0.0988  3.31521230994  # c
+pair_coeff  2  2   0.0161  2.44729877873  # h5
+pair_coeff  3  3   0.1463  3.04812087425  # o
+pair_coeff  4  4   0.0930  3.24287133403  # oh
+pair_coeff  5  5   0.0047  0.537924646013 # ho
+
+bond_coeff  1  361.80  1.105  # c-h5
+bond_coeff  2  652.57  1.218  # c=o
+bond_coeff  3  383.13  1.351  # c-oh
+bond_coeff  4  563.51  0.973  # o-h
+
+angle_coeff  1   51.617  106.550  # c-oh-ho
+angle_coeff  2   65.930  123.650  # h5-c=o
+angle_coeff  3   65.262  109.490  # h5-c-oh
+angle_coeff  4  115.745  122.100  # o=c-oh
+
+dihedral_coeff  1  1  2.3  2  180.0               # h5-c-oh-ho
+dihedral_coeff  2  2  2.3  2  180.0  1.9  1  0.0  # o=c-oh-ho
+
+                              #  h5
+                              #  |
+improper_coeff  1  10.5 -1 2  #  c
+                              # / \
+                              # o  oh
+
+#####################-----formate-----###########################################
+
+angle_coeff  5   118.817 130.250  # o-c-o
+
+                              #  h5
+                              #  |
+improper_coeff  2  10.5 -1 2  #  c
+                              # / \
+                              # o  o
+
+#####################-----magnetite-----#########################################
+
+mass  6   55.845   # Iron(II)
+mass  7   55.845   # Iron(III)
+mass  8   15.9994  # Bridging oxygen
+mass  9   15.9994  # Hydroxyl oxygen
+mass  10   1.008   # Hydroxyl hydrogen
+
+pair_coeff  6  6   9.0298e-07  4.90620  # fe2
+pair_coeff  7  7   9.0298e-07  4.90620  # fe3
+pair_coeff  8  8   0.1554      3.16554  # ob
+pair_coeff  9  9   0.1554      3.16554  # oh
+pair_coeff  10 10  0.0         0.0      # ho
+
+bond_coeff  5  554.1349  1.0   # oh-ho
+bond_coeff  6    0.0     2.08  # fe-oh (dummy bond)
+
+angle_coeff  6   30.0  109.470  # fe-oh-ho
+
+##################################################################################
+
+replicate 3 3 1
+Replicating atoms ...
+  orthogonal box = (0 0 -41.458422) to (76.32 76.32 32.908)
+  1 by 1 by 1 MPI processor grid
+  26325 atoms
+  324 bonds
+  486 angles
+  81 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.002 seconds
+  replicate CPU = 0.006 seconds
+
+# Pick the bottom fe ions of formate surface
+group formate_fe molecule 99
+576 atoms in group formate_fe
+variable zminformate equal bound(formate_fe,zmin)
+variable boct equal bound(formate_fe,zmin)
+region bottom block INF INF INF INF INF ${boct} side out units box
+region bottom block INF INF INF INF INF -3.98158700000001 side out units box
+group bottom region bottom
+12393 atoms in group bottom
+group bottom_fe intersect bottom formate_fe
+576 atoms in group bottom_fe
+
+# Before
+compute peratom bottom_fe pe/atom pair
+compute pe all reduce sum c_peratom
+thermo_style custom step temp etotal press pe c_pe
+run 0
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.13394664
+  grid = 48 48 108
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00036541423
+  estimated relative force accuracy = 1.1004341e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 332750 248832
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 10000, page size: 100000
+  master list distance cutoff = 28
+  ghost atom cutoff = 28
+  binsize = 14, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 458.8 | 458.8 | 458.8 Mbytes
+Step Temp TotEng Press PotEng c_pe 
+       0            0   -4635743.3   -6080.4769   -4635743.3   -83563.908 
+Loop time of 5.52e-07 on 1 procs for 0 steps with 26325 atoms
+
+181.2% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Bond    | 0          | 0          | 0          |   0.0 |  0.00
+Kspace  | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 5.52e-07   |            |       |100.00
+
+Nlocal:          26325 ave       26325 max       26325 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          53043 ave       53043 max       53043 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    8.77309e+07 ave 8.77309e+07 max 8.77309e+07 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 87730857
+Ave neighs/atom = 3332.6062
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 0
+Dangerous builds = 0
+uncompute peratom
+uncompute pe
+
+variable boct1 equal bound(formate_fe,zmin)-${offset}
+variable boct1 equal bound(formate_fe,zmin)-0.2
+region bulk block INF INF INF INF INF ${boct1} side in units box
+region bulk block INF INF INF INF INF -4.18158700000001 side in units box
+group bulk region bulk
+13608 atoms in group bulk
+
+variable zminbulk equal bound(bulk,zmin)
+variable boct2 equal bound(bulk,zmin)+2
+region bottom_bulk block INF INF INF INF INF ${boct2} side in units box
+region bottom_bulk block INF INF INF INF INF -27.458422 side in units box
+group bottom_bulk region bottom_bulk
+1134 atoms in group bottom_bulk
+
+variable ch equal charge(bottom_bulk)
+
+print "bottom bulk oct+tet charge ${ch}"
+bottom bulk oct+tet charge 2.44249065417534e-15
+
+delete_atoms group bottom_bulk
+WARNING: Ignoring 'compress yes' for molecular system (../delete_atoms.cpp:126)
+Deleted 1134 atoms, new total = 25191
+
+#group bulk delete
+#group bottom_bulk delete
+
+# After
+compute peratom bottom_fe pe/atom pair
+compute pe all reduce sum c_peratom
+#compute gg bottom_fe group/group bottom_bulk kspace yes
+thermo_style custom step temp etotal press pe c_pe
+run 0
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.133923
+  grid = 48 48 108
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00035812662
+  estimated relative force accuracy = 1.0784877e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 332750 248832
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 458.8 | 458.8 | 458.8 Mbytes
+Step Temp TotEng Press PotEng c_pe 
+       0            0   -4435216.3   -6529.4577   -4435216.3   -83556.675 
+Loop time of 4.93e-07 on 1 procs for 0 steps with 25191 atoms
+
+202.8% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Bond    | 0          | 0          | 0          |   0.0 |  0.00
+Kspace  | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 4.93e-07   |            |       |100.00
+
+Nlocal:          25191 ave       25191 max       25191 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          50751 ave       50751 max       50751 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    8.29229e+07 ave 8.29229e+07 max 8.29229e+07 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 82922859
+Ave neighs/atom = 3291.7653
+Ave special neighs/atom = 0.045016077
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:05

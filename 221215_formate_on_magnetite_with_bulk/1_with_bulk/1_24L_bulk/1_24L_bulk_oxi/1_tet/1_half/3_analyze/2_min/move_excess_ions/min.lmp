@@ -1,0 +1,53 @@
+variable layer index 21
+variable type string fa_tet_half_qeq
+variable rand equal round(random(0,1e7,452345))
+variable temp equal 10000
+
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+
+include ff_formic_acid_fe304.param
+
+# Bottom oct
+group bLayerFe3 id 9 22 129 29 99 149 112 339 352  # Fe3+ -> Fe2+
+
+# One oct above bottom
+group bLayerFe2 id 8 358 73 48 118 288 318 268 43  # Fe2+ -> Fe3+
+
+# Two oct above bottom
+#group bLayerFe2 id 13 33 87 203 223 323 177 297 343 # Fe2+ -> Fe3+
+
+set group bLayerFe3 type 6
+set group bLayerFe3 charge 1.05
+
+set group bLayerFe2 type 7
+set group bLayerFe2 charge 1.575
+
+group Fe type 6 7
+
+region bottomFe block INF INF INF INF INF -28.5
+group bottomFe region bottomFe 
+group bFe intersect bottomFe Fe
+
+region bottom1Fe block INF INF INF INF -27.8 -26.5
+group bottom1Fe region bottom1Fe
+group b1Fe intersect bottom1Fe Fe
+
+region bottom2Fe block INF INF INF INF -25.5 -25
+group bottom2Fe region bottom2Fe
+group b2Fe intersect bottom2Fe Fe
+
+# Equilibrate add Fe ions to the swp_group
+fix swp bFe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+thermo 100
+thermo_style custom step pe f_swp[1] f_swp[2]
+run 10000
+
+unfix swp
+
+# Full minimization
+minimize 1.0e-6 1.0e-9 1000 10000
+
+write_data 001-dbt_3x3_${layer}L_${type}_min.data

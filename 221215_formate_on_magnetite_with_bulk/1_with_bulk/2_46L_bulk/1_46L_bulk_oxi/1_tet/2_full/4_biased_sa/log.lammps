@@ -1,0 +1,349 @@
+LAMMPS (17 Feb 2022)
+variable layer index 21
+variable type string fa_tet_full_qeq_lqeq
+variable rand equal round(random(0,1e7,452345))
+variable temp index 50000 45000 40500 36450 32805 29524 26571 23913 21521 19368 17431 15687 14118 12706 11435 10291 9261 8334 7500 6750 6075 5467 4920 4428 3985 3586 3227 2904 2613 2351 2115 1903 1712 1540 1386 1247 1122 1009 908 817 735 661 594 534 480 432 388 349 314 282 253 227 204 183 164 147 132 118 106 95 85 76 68 61 54 48 43 38 34 30 27 24 21 18 16 14 12 10 9 8 7 6 5 4 3 2 1
+
+include settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/long 12.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+kspace_style       pppm 1.0e-6
+kspace_modify      slab 3.0
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+read_data 001-dbt_3x3_21L_${type}.data
+read_data 001-dbt_3x3_21L_fa_tet_full_qeq_lqeq.data
+Reading data file ...
+  orthogonal box = (0 0 -64.778423) to (25.44 25.44 32.908)
+  1 by 2 by 4 MPI processor grid
+  reading atoms ...
+  4356 atoms
+  reading velocities ...
+  4356 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  72 bonds
+  reading angles ...
+  108 angles
+  reading impropers ...
+  18 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.016 seconds
+
+include ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass  1   12.011   # Sp2 C carbonyl group
+mass  2    1.008   # H bonded to non-sp3 carbon with 2 electrwd. group
+mass  3   15.9994  # Oxygen with one connected atom
+mass  4   15.9994  # Oxygen in hydroxyl group
+mass  5    1.008   # Hydroxyl group
+
+pair_coeff  1  1   0.0988  3.31521230994  # c
+pair_coeff  2  2   0.0161  2.44729877873  # h5
+pair_coeff  3  3   0.1463  3.04812087425  # o
+pair_coeff  4  4   0.0930  3.24287133403  # oh
+pair_coeff  5  5   0.0047  0.537924646013 # ho
+
+bond_coeff  1  361.80  1.105  # c-h5
+bond_coeff  2  652.57  1.218  # c=o
+bond_coeff  3  383.13  1.351  # c-oh
+bond_coeff  4  563.51  0.973  # o-h
+
+angle_coeff  1   51.617  106.550  # c-oh-ho
+angle_coeff  2   65.930  123.650  # h5-c=o
+angle_coeff  3   65.262  109.490  # h5-c-oh
+angle_coeff  4  115.745  122.100  # o=c-oh
+
+dihedral_coeff  1  1  2.3  2  180.0               # h5-c-oh-ho
+dihedral_coeff  2  2  2.3  2  180.0  1.9  1  0.0  # o=c-oh-ho
+
+                              #  h5
+                              #  |
+improper_coeff  1  10.5 -1 2  #  c
+                              # / \
+                              # o  oh
+
+#####################-----formate-----###########################################
+
+angle_coeff  5   118.817 130.250  # o-c-o
+
+                              #  h5
+                              #  |
+improper_coeff  2  10.5 -1 2  #  c
+                              # / \
+                              # o  o
+
+#####################-----magnetite-----#########################################
+
+mass  6   55.845   # Iron(II)
+mass  7   55.845   # Iron(III)
+mass  8   15.9994  # Bridging oxygen
+mass  9   15.9994  # Hydroxyl oxygen
+mass  10   1.008   # Hydroxyl hydrogen
+
+pair_coeff  6  6   9.0298e-07  4.90620  # fe2
+pair_coeff  7  7   9.0298e-07  4.90620  # fe3
+pair_coeff  8  8   0.1554      3.16554  # ob
+pair_coeff  9  9   0.1554      3.16554  # oh
+pair_coeff  10 10  0.0         0.0      # ho
+
+bond_coeff  5  554.1349  1.0   # oh-ho
+bond_coeff  6    0.0     2.08  # fe-oh (dummy bond)
+
+angle_coeff  6   30.0  109.470  # fe-oh-ho
+
+##################################################################################
+
+group fe type 6 7
+1818 atoms in group fe
+
+compute coord fe coord/atom cutoff 2.0
+dump coord fe custom 1 fe_${layer}L.coord id type c_coord
+dump coord fe custom 1 fe_21L.coord id type c_coord
+dump_modify coord sort id
+run 0
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29499882
+  grid = 45 45 250
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00038505019
+  estimated relative force accuracy = 1.1595672e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 318060 193545
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 4 4 14
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute coord/atom, occasional
+      attributes: full, newton on
+      pair build: full/bin
+      stencil: full/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 19.58 | 26.4 | 41.86 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0   -792750.96     225.3616   -792525.59    1.4959098 
+Loop time of 5.92038e-06 on 8 procs for 0 steps with 4356 atoms
+
+88.7% CPU use with 8 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Bond    | 0          | 0          | 0          |   0.0 |  0.00
+Kspace  | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 5.92e-06   |            |       |100.00
+
+Nlocal:          544.5 ave         747 max         351 min
+Histogram: 4 0 0 0 0 0 0 0 2 2
+Nghost:        7217.12 ave        9585 max        4687 min
+Histogram: 4 0 0 0 0 0 0 0 0 4
+Neighs:         271346 ave      408741 max      107073 min
+Histogram: 2 0 1 1 0 0 0 0 1 3
+FullNghs:       542692 ave      802926 max      291116 min
+Histogram: 4 0 0 0 0 0 0 0 0 4
+
+Total # of neighbors = 4341532
+Ave neighs/atom = 996.6786
+Ave special neighs/atom = 0.05785124
+Neighbor list builds = 0
+Dangerous builds = 0
+variable fet atom c_coord==4
+group fet variable fet
+594 atoms in group fet
+group feo subtract fe fet
+1224 atoms in group feo
+undump coord
+
+# Reset molIDs
+set mol 1 mol 0
+Setting atom values ...
+  180 settings made for mol
+set mol 2 mol 0
+Setting atom values ...
+  396 settings made for mol
+set group fet mol 1
+Setting atom values ...
+  594 settings made for mol
+set group feo mol 2
+Setting atom values ...
+  1224 settings made for mol
+
+variable nfeo equal count(feo)
+variable nsteps equal round((${nfeo}*${nfeo})/4)
+variable nsteps equal round((1224*${nfeo})/4)
+variable nsteps equal round((1224*1224)/4)
+
+label minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp feo atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp feo atom/swap 1 1 855824 ${temp} ke no types 6 7
+  fix swp feo atom/swap 1 1 855824 50000 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 374544
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29499882
+  grid = 45 45 250
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00038505019
+  estimated relative force accuracy = 1.1595672e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 318060 193545
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 18.3 | 25.12 | 40.57 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+       0        50000   -792525.59            0            0 
+     100        50000   -800776.93          100           66 
+     200        50000    -801626.5          200          133 
+     300        50000   -802024.24          300          196 
+     400        50000   -801529.26          400          256 
+     500        50000   -801575.93          500          315 
+     600        50000   -802046.52          600          373 
+     700        50000   -802041.04          700          437 
+     800        50000   -802050.39          800          508 
+     900        50000   -801812.45          900          574 
+    1000        50000   -802202.21         1000          637 
+    1100        50000   -801978.21         1100          705 
+    1200        50000   -802100.38         1200          763 
+    1300        50000   -801677.21         1300          822 
+    1400        50000   -802095.04         1400          891 
+    1500        50000   -801812.82         1500          965 
+    1600        50000   -802545.02         1600         1027 
+    1700        50000   -802466.91         1700         1096 
+    1800        50000   -802501.18         1800         1160 
+    1900        50000    -802419.4         1900         1228 
+    2000        50000   -802844.75         2000         1299 
+    2100        50000   -802333.65         2100         1365 
+    2200        50000   -802242.44         2200         1430 
+    2300        50000   -802012.96         2300         1501 
+    2400        50000   -802496.66         2400         1574 
+    2500        50000   -802396.41         2500         1640 
+    2600        50000   -802641.29         2600         1711 
+    2700        50000   -802592.75         2700         1777 
+    2800        50000   -802123.23         2800         1842 
+    2900        50000   -802316.32         2900         1916 
+    3000        50000   -801921.34         3000         1984 
+    3100        50000   -802498.79         3100         2049 
+    3200        50000   -803042.64         3200         2115 
+    3300        50000   -802116.05         3300         2180 
+    3400        50000   -802591.68         3400         2244 
+    3500        50000   -802398.08         3500         2310 
+    3600        50000   -801731.58         3600         2380 
+    3700        50000   -801807.45         3700         2438 
+    3800        50000   -802343.08         3800         2504 
+    3900        50000   -801186.58         3900         2574 
+    4000        50000   -802077.82         4000         2645 
+    4100        50000   -802833.03         4100         2710 
+    4200        50000   -803117.88         4200         2773 
+    4300        50000   -803394.53         4300         2839 
+    4400        50000   -802766.24         4400         2901 
+    4500        50000   -802702.35         4500         2966 
+    4600        50000   -802372.61         4600         3031 
+    4700        50000   -802290.43         4700         3098 
+    4800        50000   -802667.59         4800         3166 
+    4900        50000   -802856.39         4900         3232 
+    5000        50000   -802557.15         5000         3303 
+    5100        50000   -802867.63         5100         3369 
+    5200        50000   -802898.21         5200         3447 
+    5300        50000   -802499.25         5300         3512 
+    5400        50000   -802283.39         5400         3575 
+    5500        50000      -802005         5500         3635 
+    5600        50000   -802425.39         5600         3699 
+    5700        50000   -802447.51         5700         3763 
+    5800        50000   -802357.43         5800         3823 
+    5900        50000   -801980.59         5900         3888 
+    6000        50000    -801786.1         6000         3946 
+    6100        50000   -801330.89         6100         4017 
+    6200        50000   -801187.65         6200         4076 
+    6300        50000   -801213.42         6300         4146 
+    6400        50000   -801728.06         6400         4216 
+    6500        50000   -801477.67         6500         4288 
+    6600        50000   -801044.12         6600         4359 
+    6700        50000   -801418.97         6700         4426 
+    6800        50000   -801479.69         6800         4491 
+    6900        50000   -802831.74         6900         4558 
+    7000        50000   -802385.75         7000         4620 
+    7100        50000   -802485.98         7100         4694 
+    7200        50000   -802291.33         7200         4759 
+    7300        50000   -802404.72         7300         4821 
+    7400        50000   -801896.32         7400         4886 
+    7500        50000   -801920.82         7500         4949 
+    7600        50000   -801432.78         7600         5018 
+    7700        50000   -801109.12         7700         5086 
+    7800        50000    -802010.3         7800         5151 
+    7900        50000   -802092.59         7900         5220 
+    8000        50000   -801253.49         8000         5280 
+    8100        50000    -802553.9         8100         5338 
+    8200        50000   -802909.34         8200         5398 
+    8300        50000   -802694.92         8300         5466 
+    8400        50000   -803076.44         8400         5526 
+    8500        50000   -802462.74         8500         5594 
+    8600        50000   -802485.64         8600         5651 
+    8700        50000   -801890.79         8700         5713 
+    8800        50000    -802569.2         8800         5780 
+    8900        50000   -802554.27         8900         5848 
+    9000        50000    -802016.5         9000         5920 
+    9100        50000   -802428.64         9100         5986 
+    9200        50000   -803073.49         9200         6051 
+    9300        50000   -803212.07         9300         6129 
+    9400        50000   -802517.01         9400         6189 
+    9500        50000   -802907.58         9500         6252 
+    9600        50000   -803301.61         9600         6314 
+    9700        50000   -803285.62         9700         6380 
+    9800        50000   -803340.45         9800         6448 
+    9900        50000   -803192.65         9900         6521 
+   10000        50000   -802914.04        10000         6585 
+   10100        50000   -802791.13        10100         6647 
+   10200        50000   -802236.63        10200         6708 
+   10300        50000   -802049.03        10300         6778 
+   10400        50000   -802082.92        10400         6847 
+   10500        50000   -802011.74        10500         6907 
+   10600        50000   -802467.98        1

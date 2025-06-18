@@ -1,0 +1,174 @@
+variable layer index 21
+variable type string int
+variable cover string full
+variable dl equal 1.06  # Distance between Fe_oct and Fe_tet layers. 
+variable octoct equal 2*${dl} # Distance betweeen Fe_oct Fe_oct layers.
+variable offset equal 0.2
+variable boffset equal 12  # Simulation box offset that corresponds to coulumb realspace cutoff. 
+
+variable q1 equal 1.050  # Charge of Fe(II).
+variable q2 equal 1.575  # Charge of Fe(III).
+variable q3 equal -1.050  # Charge of O.
+variable rand equal round(random(0,1e7,452345))
+
+include settings_noKspace.lmp
+
+# Bulk surface.
+read_data 001-dbt_41L_bulk.data extra/bond/per/atom 3 &
+ extra/angle/per/atom 3 &
+ extra/improper/per/atom 3 &
+ group bulk
+
+include ff_formic_acid_fe304.param
+
+group fe type 6 7 
+
+# Erase the non-bulk part.
+region bulk_excess block INF INF INF INF -21.9 4.2 side out units box
+group bulk_excess region bulk_excess
+group del_excess intersect bulk bulk_excess
+delete_atoms group del_excess
+
+reset_atom_ids
+
+# Sanity check
+variable qtot equal charge(all)
+print "total charge of the system : ${qtot}"
+
+replicate 1 1 2
+
+# Define the regions of replicated bulks.
+region top_bulk block INF INF INF INF 40 75 side in units box
+region bottom_bulk block INF INF INF INF -25 15 side in units box
+
+group top_bulk region top_bulk
+group bottom_bulk region bottom_bulk
+
+group top_bulk_fe intersect top_bulk fe 
+group bottom_bulk_fe intersect bottom_bulk fe
+
+variable top_bulk_min equal bound(top_bulk_fe,zmin)
+variable bottom_bulk_top equal bound(bottom_bulk_fe,zmax)
+
+variable dist_bulk equal ${top_bulk_min}-${bottom_bulk_top}
+variable dist_move equal ${dist_bulk}-${dl}
+
+# Combine replicated bulks.
+displace_atoms bottom_bulk move 0 0 ${dist_move}
+
+# Erase 2 bottom layers.
+variable bottom_bulk_min equal bound(bottom_bulk_fe,zmin)
+variable bottom_del equal ${bottom_bulk_min}+1.53
+#
+region bottom_del block INF INF INF INF ${bottom_del} INF side out units box
+group bottom_del region bottom_del
+#group del_excess intersect bulk bulk_excess
+delete_atoms group bottom_del
+
+group bulk delete
+
+# Open some space for the formate coated surface.
+group bulk type 6 7 8 9
+displace_atoms bulk move 0 0 -200 units box
+change_box all z scale 5.0
+
+# Formate surface.
+read_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_init.data add append group formate
+
+# To avoid stretching bonds at int sites.
+displace_atoms all move 0 1 0 units box
+
+set atom * image 0 0 0
+
+# All fe ions.
+group fe type 6 7 
+
+group formate_fe intersect formate fe
+group bulk_fe intersect bulk fe
+
+# Reset molID 99 and use it for formate fe ions.
+set mol 99 mol 98
+set group formate_fe mol 99
+
+##
+## Align combined system
+##
+
+# Zmin and Zmax.
+variable zminformate equal bound(formate_fe,zmin)
+variable zmaxbulk equal bound(bulk_fe,zmax)
+
+# Xmax.
+variable xmaxformate equal bound(formate_fe,xmax)
+variable xmaxbulk equal bound(bulk_fe,xmax)
+
+# Ymax.
+variable ymaxformate equal bound(formate_fe,ymax)
+variable ymaxbulk equal bound(bulk_fe,ymax)
+
+# Combine formate surface region and bulk region.
+variable zdist equal (${zminformate}-${zmaxbulk})-${dl}
+displace_atoms bulk move 0 0 ${zdist}
+
+# Align x-axis.
+variable xdist equal ${xmaxformate}-${xmaxbulk}
+displace_atoms bulk move ${xdist} 0 0 
+
+# Align y-axis.
+variable ydist equal ${ymaxformate}-${ymaxbulk}
+displace_atoms bulk move 0 ${ydist} 0 
+
+##
+## Middle region oxidation
+##
+
+# Pick fe ions in middle0
+variable middle0 equal bound(bulk_fe,zmin)+10*${octoct}
+variable min_middle0 equal ${middle0}-0.5
+variable max_middle0 equal ${middle0}+0.5
+region middle0 block INF INF INF INF ${min_middle0} ${max_middle0} side in units box
+group middle0 region middle0
+set group middle0 mol 100
+
+# Pick fe ions in middle1
+variable middle1 equal bound(bulk_fe,zmin)+11*${octoct}
+variable min_middle1 equal ${middle1}-0.5
+variable max_middle1 equal ${middle1}+0.5
+region middle1 block INF INF INF INF ${min_middle1} ${max_middle1} side in units box
+group middle1 region middle1
+set group middle1 mol 101
+
+# Pick fe ions in middle2
+variable middle2 equal bound(bulk_fe,zmin)+12*${octoct}
+variable min_middle2 equal ${middle2}-0.5
+variable max_middle2 equal ${middle2}+0.5
+region middle2 block INF INF INF INF ${min_middle2} ${max_middle2} side in units box
+group middle2 region middle2
+set group middle2 mol 102
+
+# Pick middle1 for oxidation state swaps
+group fe2 type 6
+group bottom_fe2 intersect middle1 fe2
+
+# Charge neutrality
+#if "${cover} == full" then &
+# "set group bottom_fe2 type/subset 7 18 ${rand}" &
+# "set type 7 charge ${q2}"
+
+#if "${cover} == half" then &
+# "set group bottom_fe2 type/subset 7 9 ${rand}" &
+# "set type 7 charge ${q2}"
+
+reset_atom_ids sort yes
+
+# Rearange simulation box.
+variable zmax equal bound(all,zmax)+${boffset}
+variable zmin equal bound(all,zmin)-${boffset}
+
+change_box all z final ${zmin} ${zmax} units box
+
+# Sanity check
+variable qtot equal charge(all)
+print "total charge of the system : ${qtot}"
+
+write_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_on_46bulk_init.data

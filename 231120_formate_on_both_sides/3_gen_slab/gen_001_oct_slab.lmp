@@ -1,0 +1,88 @@
+variable	z_rep equal 2.12  # Repetation distance between layers: Fe_oct, Fe_tet.
+variable	ulayer equal 9	# Number of layers in a unitcell.
+variable	offset equal 0.1  # Offset for deleting atoms.
+variable	rep equal 10  # Amount of repetation in z-direction.
+variable	n loop 1 30
+variable	max_layer equal ${rep}*(${ulayer}-1)
+
+variable        q1 equal 1.050  # Charge of Fe(II).
+variable        q2 equal 1.575  # Charge of Fe(III).
+variable        q3 equal -1.050  # Charge of O.
+variable        rand equal round(random(0,1e7,452345))
+
+label loop
+
+  units           real
+  processors      * * 1
+  atom_style      full
+  boundary        p p p
+  
+  # Modified CLAYFF parameters from Kerisit (2011)
+  pair_style      lj/cut/coul/cut 12.0
+  
+  read_data       mFd3m_with_extra_types.data 
+  
+  replicate       3 3 ${rep}
+  
+  variable        xhi equal lx
+  variable        yhi equal ly
+  variable        zhi equal lz
+  
+  print		"${xhi} ${yhi} ${zhi}"
+  
+  change_box      all x final 0.0 ${xhi} &
+                      y final 0.0 ${yhi} &
+                      z final 0.0 ${zhi} &
+                      boundary p p f remap &
+                      units box
+ 
+  # Delete the upmost layers.
+  # This is done in order to match the geometry 
+  # that was used in previous calculations.
+  variable      zmax equal bound(all,zmax)
+  variable	zmax_del equal ${zmax}-${offset}-${z_rep}*3 
+  region	del_max block INF INF INF INF INF ${zmax_del} units box side out
+  delete_atoms	region del_max
+  variable	upmost_oct equal ${max_layer}-7
+ 
+  # Delete the bottom Fe_oct and Fe_tet layers in sequential order. 
+  variable	zmin equal bound(all,zmin)
+  variable	zmin_del equal ${zmin}+${z_rep}*${n}-${offset}
+  region	del_min block INF INF INF INF ${zmin_del} INF units box side out
+  delete_atoms	region del_min
+  variable	layer equal ${upmost_oct}-2*${n}
+  
+  group		Fe type 6 7
+  group		O type 8
+  variable	nFe equal count(Fe)
+  variable	nO equal count(O)
+ 
+  variable	nFe_3 equal (${q1}*(${nO}-${nFe}))/(${q2}-${q1})
+  
+  # Reset all Fe ions to Fe(II).
+  set		group Fe type 6 
+ 
+  # Set a random subset to Fe ions to Fe(III) to assure charge neutrality.
+  set		group Fe type/subset 7 ${nFe_3} ${rand}
+ 
+  set		type 6 charge ${q1}
+  set		type 7 charge ${q2}
+  set		type 8 charge ${q3}
+ 
+  reset_atom_ids
+ 
+  # Sanity check.
+  variable	qtot equal charge(all)
+  print		"total charge of system: ${qtot}"
+ 
+  # Simulation box is pulled in z-direction to match
+  # spatial coordinates of surface ions
+  # which was used in previous calculations.
+#  change_box	all z final -33.920004 25.439996 remap units box
+  
+  write_data	001-dbt_3x3_${layer}L_init.data
+  
+  clear
+  
+next n
+jump SELF loop

@@ -1,0 +1,7 @@
+REMARK original generated coordinate pdb file
+ATOM      1  C   FORHF   1      -0.452  -0.014   0.000  1.00  0.00      A    C
+ATOM      2  H   FORHF   1      -1.292  -0.556   0.000  0.00  0.00      A    H
+ATOM      3  O2  FORHF   1      -0.742   1.164  -0.000  1.00  0.00      A    O
+ATOM      4  O1  FORHF   1       0.840  -0.491  -0.000  1.00  0.00      A    O
+ATOM      5  HO1 FORHF   1       1.473   0.283   0.000  0.00  0.00      A    H
+END

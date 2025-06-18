@@ -1,0 +1,88 @@
+LAMMPS data file. CGCMM Style. atom_style full. Created by charmm2lammps v1.9.2 on Do 3. Feb 15:23:11 CET 2022
+
+           5  atoms
+           4  bonds
+           4  angles
+           2  dihedrals
+           1  impropers
+
+           5  atom types
+           4  bond types
+           4  angle types
+           2  dihedral types
+           1  improper types
+
+      -1.292        1.473 xlo xhi
+      -0.556        1.164 ylo yhi
+          -1            1 zlo zhi
+
+Masses
+
+       1     12.011  # CG2O2
+       2      1.008  # HGR52
+       3    15.9994  # OG2D1
+       4    15.9994  # OG311
+       5      1.008  # HGP1
+
+Pair Coeffs # lj/charmm/coul/long
+
+       1            0.098    3.02905564168            0.098    3.02905564168  # CG2O2
+       2            0.046    1.60361769265            0.046    1.60361769265  # HGR52
+       3             0.12    3.02905564168             0.12    2.49451641079  # OG2D1
+       4           0.1921    3.14487247504           0.1921    3.14487247504  # OG311
+       5            0.046   0.400013524445            0.046   0.400013524445  # HGP1
+
+Atoms # full
+
+       1       1     1      0.38           -0.452           -0.014                0  # CG2O2
+       2       1     2      0.11           -1.292           -0.556                0  # HGR52
+       3       1     3      -0.4           -0.742            1.164                0  # OG2D1
+       4       1     4     -0.49             0.84           -0.491                0  # OG311
+       5       1     5       0.4            1.473            0.283                0  # HGP1
+
+Bond Coeffs # harmonic
+
+       1              348            1.096  # CG2O2    HGR52   
+       2              750             1.22  # CG2O2    OG2D1   
+       3              230              1.4  # CG2O2    OG311   
+       4              545             0.96  # HGP1 OG311   
+
+Bonds
+
+       1       3       1       4  # CG2O2    OG311   
+       2       1       1       2  # CG2O2    HGR52   
+       3       2       1       3  # CG2O2    OG2D1   
+       4       4       4       5  # HGP1 OG311   
+
+Angle Coeffs # charmm
+
+       1               55              115                0                0  # CG2O2    OG311    HGP1
+       2               39              119                0                0  # HGR52    CG2O2    OG2D1   
+       3               47              105                0                0  # HGR52    CG2O2    OG311   
+       4               50              123              210            2.262  # OG2D1    CG2O2    OG311   
+
+Angles
+
+       1       1       1       4       5  # CG2O2    OG311    HGP1
+       2       2       2       1       3  # HGR52    CG2O2    OG2D1   
+       3       4       4       1       3  # OG2D1    CG2O2    OG311   
+       4       3       4       1       2  # HGR52    CG2O2    OG311   
+
+Dihedral Coeffs # charmm
+
+       1             3.45                2              180                1  # HGP1 OG311    CG2O2    HGR52   
+       2             2.05                2              180                1  # HGP1 OG311    CG2O2    OG2D1   
+
+Dihedrals
+
+       1       1       2       1       4       5  # HGP1 OG311    CG2O2    HGR52   
+       2       2       3       1       4       5  # HGP1 OG311    CG2O2    OG2D1   
+
+Improper Coeffs # harmonic
+
+       1               75                0  # CG2O2    OG2D1    OG311    HGR52   
+
+Impropers
+
+       1       1       1       3       4       2  # CG2O2    OG2D1    OG311    HGR52   
+

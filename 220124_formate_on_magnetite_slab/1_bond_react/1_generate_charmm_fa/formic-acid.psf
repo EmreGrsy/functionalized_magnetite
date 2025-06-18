@@ -1,0 +1,40 @@
+PSF
+
+       3 !NTITLE
+ REMARKS original generated structure charmm psf file
+ REMARKS topology top_all36_cgenff.rtf 
+ REMARKS segment A { first NONE; last NONE; auto angles dihedrals }
+
+       5 !NATOM
+       1 A    1    FORH C       1   0.380000       12.0110           0
+       2 A    1    FORH H       2   0.110000        1.0080           0
+       3 A    1    FORH O2      3  -0.400000       15.9994           0
+       4 A    1    FORH O1      4  -0.490000       15.9994           0
+       5 A    1    FORH HO1     5   0.400000        1.0080           0
+
+       4 !NBOND: bonds
+       1       4       1       2       1       3       4       5
+
+       4 !NTHETA: angles
+       1       4       5       2       1       3       4       1       3
+       4       1       2
+
+       2 !NPHI: dihedrals
+       2       1       4       5       3       1       4       5
+
+       1 !NIMPHI: impropers
+       1       3       4       2
+
+       0 !NDON: donors
+
+
+       0 !NACC: acceptors
+
+
+       0 !NNB
+
+       0       0       0       0       0
+
+       1       0 !NGRP
+       0       0       0
+

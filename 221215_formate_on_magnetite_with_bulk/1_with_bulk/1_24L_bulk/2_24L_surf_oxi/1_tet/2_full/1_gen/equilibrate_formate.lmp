@@ -1,0 +1,87 @@
+variable  rand equal round(random(0,1e7,452345))
+variable layer index 29
+
+variable temp index 500000 450000 405000 364500 328050 295245 265720 239148 215233 193709
+variable type string tet_full
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_fa_${type}_on_bulk_init.data
+
+include ff_formic_acid_fe304.param
+
+dump dmp all custom 100 swap_${layer}L_${type}.lammpstrj id mol type q x y z
+dump_modify dmp sort id
+
+# Formate coated fe ions.
+group fe molecule 99
+variable nfe equal count(fe)
+variable nsteps equal round((${nfe}*${nfe})/4)
+
+compute coord fe coord/atom cutoff 2.0
+dump coord fe custom 1 fe_${layer}L.coord id type c_coord
+dump_modify coord sort id
+run 0
+variable fet atom c_coord==4
+group fet variable fet
+group feo subtract fe fet
+undump coord
+
+# Reset molIDs 
+set mol 1 mol 0
+set mol 2 mol 0
+set group fet mol 1
+set group feo mol 2
+
+variable fet3 atom "gmask(fet) && q == 1.575"
+group fet3 dynamic fe var fet3 every 100
+variable rfet3 equal count(fet3)/count(fet)
+
+variable feo3 atom "gmask(feo) && q == 1.575"
+group feo3 dynamic fe var feo3 every 100
+variable rfeo3 equal count(feo3)/count(feo)
+
+variable cnum equal 109
+
+# High Tmc swaps to randomize the oxidation states.
+fix swp fe atom/swap 1 1 ${rand} 10000000 ke no types 6 7
+thermo 100
+thermo_style custom step pe f_swp[1] f_swp[2] v_rfet3 v_rfeo3
+run 1000
+
+unfix swp
+thermo_style custom step temp pe
+write_data 001-dbt_3x3_${layer}L_fa_${type}_rand.data
+
+
+label minimize_temp
+
+  variable ftemp equal v_temp
+  
+  group  immobile_1 type 1 2 3 6 7 8
+  fix  freeze immobile_1 setforce 0.0 0.0 0.0
+  minimize  1.0e-6 1.0e-9 1000 10000
+  unfix  freeze
+  group immobile_1 delete
+
+  group  immobile_2 type 6 7 8 9 10
+  fix  freeze immobile_2 setforce 0.0 0.0 0.0
+  minimize  1.0e-6 1.0e-9 1000 10000
+  unfix  freeze
+  group immobile_2 delete
+  
+  fix  swp fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp v_cnum pe f_swp[1] f_swp[2] v_rfet3 v_rfeo3
+  run 1000
+ 
+  variable cnum equal (${cnum}-1)
+
+  unfix swp
+  thermo_style custom step temp pe
+  write_data  001-dbt_3x3_${layer}L_fa_${type}_${cnum}_${temp}K.data
+
+next temp
+jump SELF minimize_temp
+
+write_data  001-dbt_3x3_${layer}L_fa_${type}_qeq.data

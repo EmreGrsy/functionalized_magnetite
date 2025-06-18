@@ -1,0 +1,46 @@
+variable layer index 21
+variable type string tet
+variable cover string half
+variable offset equal 0.2
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_fa_${type}_${cover}_on_bulk_init.data
+
+include ff_formic_acid_fe304.param
+
+# Pick the bottom fe ions of formate surface
+group formate_fe molecule 99
+variable zminformate equal bound(formate_fe,zmin)
+variable boct equal bound(formate_fe,zmin)+${offset}
+region bottom block INF INF INF INF INF ${boct} side in units box
+group bottom region bottom
+group bottom_fe intersect bottom formate_fe
+
+
+
+compute peratom bottom_fe pe/atom
+compute pe all reduce sum c_peratom
+thermo_style custom step temp etotal press pe c_pe
+run 0
+uncompute peratom
+uncompute pe
+
+variable boct1 equal bound(formate_fe,zmin)-${offset}
+region bulk block INF INF INF INF INF ${boct1} side in units box
+group bulk region bulk
+
+variable zminbulk equal bound(bulk,zmin)
+variable boct2 equal bound(bulk,zmin)+${offset}
+region bottom_bulk block INF INF INF INF INF ${boct2} side in units box
+group bottom_bulk region bottom_bulk
+
+delete_atoms group bottom_bulk
+
+group bulk delete
+group bottom_bulk delete
+
+compute peratom bottom_fe pe/atom
+compute pe all reduce sum c_peratom
+thermo_style custom step temp etotal press pe c_pe
+run 0

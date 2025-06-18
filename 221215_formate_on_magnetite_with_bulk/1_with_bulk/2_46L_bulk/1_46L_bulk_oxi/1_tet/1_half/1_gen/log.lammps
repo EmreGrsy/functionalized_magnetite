@@ -1,0 +1,32 @@
+LAMMPS (17 Feb 2022)
+variable layer index 21
+variable type string fa_tet_half_qeq
+variable rand equal round(random(0,1e7,452345))
+variable temp index 50000 45000 40500 36450 32805 29524 26571 23913 21521 19368 17431 15687 14118 12706 11435 10291 9261 8334 7500 6750 6075 5467 4920 4428 3985 3586 3227 2904 2613 2351 2115 1903 1712 1540 1386 1247 1122 1009 908 817 735 661 594 534 480 432 388 349 314 282 253 227 204 183 164 147 132 118 106 95 85 76 68 61 54 48 43 38 34 30 27 24 21 18 16 14 12 10 9 8 7 6 5 4 3 2 1
+
+variable nsteps equal 324  # (nfe*nfe)/4
+
+include settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/long 12.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+kspace_style       pppm 1.0e-6
+kspace_modify      slab 3.0
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+read_data 001-dbt_3x3_21L_${type}.data
+read_data 001-dbt_3x3_21L_fa_tet_half_qeq.data
+ERROR: Cannot open file 001-dbt_3x3_21L_fa_tet_half_qeq.data: No such file or directory (../read_data.cpp:333)
+Last command: read_data 001-dbt_3x3_${layer}L_${type}.data

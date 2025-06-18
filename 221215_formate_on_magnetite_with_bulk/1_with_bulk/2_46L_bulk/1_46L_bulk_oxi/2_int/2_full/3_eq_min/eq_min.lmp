@@ -1,0 +1,49 @@
+variable layer index 21
+variable type string fa_int_full_qeq
+variable rand equal round(random(0,1e7,452345))
+variable temp index 50000 45000 40500 36450 32805 29524 26571 23913 21521 19368 17431 15687 14118 12706 11435 10291 9261 8334 7500 6750 6075 5467 4920 4428 3985 3586 3227 2904 2613 2351 2115 1903 1712 1540 1386 1247 1122 1009 908 817 735 661 594 534 480 432 388 349 314 282 253 227 204 183 164 147 132 118 106 95 85 76 68 61 54 48 43 38 34 30 27 24 21 18 16 14 12 10 9 8 7 6 5 4 3 2 1
+
+variable nsteps equal 972  # (nfe*nfe)/4
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_${type}_lqeq.data
+
+include ff_formic_acid_fe304.param
+
+group Felayer molecule 101 100 102
+group Fe type 6 7
+group swpFe intersect Fe Felayer
+
+#label minimize_temp
+
+#  variable ftemp equal v_temp
+
+#  # Electrostatic relaxation
+#  fix swp swpFe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+#  thermo 100
+#  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+#  run ${nsteps}
+  
+#  unfix swp
+#  thermo_style custom step temp pe
+
+#next temp
+#jump SELF minimize_temp
+
+region freeze block INF INF INF INF INF -5 side in
+group freeze region freeze
+
+
+# Full minimization
+fix  freeze freeze setforce 0.0 0.0 0.0
+minimize 1.0e-6 1.0e-9 1000 10000
+
+min_modify integrator eulerexplicit tmax 10.0 tmin 0.0 delaystep 5 &
+          dtgrow 1.1 dtshrink 0.5 alpha0 0.1 alphashrink 0.99 &
+          vdfmax 100000 halfstepback no initialdelay no
+
+
+
+
+write_data 001-dbt_3x3_${layer}L_${type}_lqeq_min.data

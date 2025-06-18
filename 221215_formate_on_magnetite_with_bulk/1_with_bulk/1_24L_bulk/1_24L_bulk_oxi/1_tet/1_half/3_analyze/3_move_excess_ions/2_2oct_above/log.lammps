@@ -1,0 +1,559 @@
+LAMMPS (17 Feb 2022)
+variable layer index 21
+variable type string fa_tet_half_qeq
+variable rand equal round(random(0,1e7,452345))
+variable temp index 50000 45000 40500 36450 32805 29524 26571 23913 21521 19368 17431 15687 14118 12706 11435 10291 9261 8334 7500 6750 6075 5467 4920 4428 3985 3586 3227 2904 2613 2351 2115 1903 1712 1540 1386 1247 1122 1009 908 817 735 661 594 534 480 432 388 349 314 282 253 227 204 183 164 147 132 118 106 95 85 76 68 61 54 48 43 38 34 30 27 24 21 18 16 14 12 10 9 8 7 6 5 4 3 2 1
+variable nsteps equal 324  # (nfe*nfe)/4
+
+include settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/long 12.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+kspace_style       pppm 1.0e-6
+kspace_modify      slab 3.0
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+read_data 001-dbt_3x3_21L_${type}.data
+read_data 001-dbt_3x3_21L_fa_tet_half_qeq.data
+Reading data file ...
+  orthogonal box = (0 0 -41.458422) to (25.44 25.44 32.908)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  2925 atoms
+  reading velocities ...
+  2925 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  36 bonds
+  reading angles ...
+  54 angles
+  reading impropers ...
+  9 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.008 seconds
+
+include ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass  1   12.011   # Sp2 C carbonyl group
+mass  2    1.008   # H bonded to non-sp3 carbon with 2 electrwd. group
+mass  3   15.9994  # Oxygen with one connected atom
+mass  4   15.9994  # Oxygen in hydroxyl group
+mass  5    1.008   # Hydroxyl group
+
+pair_coeff  1  1   0.0988  3.31521230994  # c
+pair_coeff  2  2   0.0161  2.44729877873  # h5
+pair_coeff  3  3   0.1463  3.04812087425  # o
+pair_coeff  4  4   0.0930  3.24287133403  # oh
+pair_coeff  5  5   0.0047  0.537924646013 # ho
+
+bond_coeff  1  361.80  1.105  # c-h5
+bond_coeff  2  652.57  1.218  # c=o
+bond_coeff  3  383.13  1.351  # c-oh
+bond_coeff  4  563.51  0.973  # o-h
+
+angle_coeff  1   51.617  106.550  # c-oh-ho
+angle_coeff  2   65.930  123.650  # h5-c=o
+angle_coeff  3   65.262  109.490  # h5-c-oh
+angle_coeff  4  115.745  122.100  # o=c-oh
+
+dihedral_coeff  1  1  2.3  2  180.0               # h5-c-oh-ho
+dihedral_coeff  2  2  2.3  2  180.0  1.9  1  0.0  # o=c-oh-ho
+
+                              #  h5
+                              #  |
+improper_coeff  1  10.5 -1 2  #  c
+                              # / \
+                              # o  oh
+
+#####################-----formate-----###########################################
+
+angle_coeff  5   118.817 130.250  # o-c-o
+
+                              #  h5
+                              #  |
+improper_coeff  2  10.5 -1 2  #  c
+                              # / \
+                              # o  o
+
+#####################-----magnetite-----#########################################
+
+mass  6   55.845   # Iron(II)
+mass  7   55.845   # Iron(III)
+mass  8   15.9994  # Bridging oxygen
+mass  9   15.9994  # Hydroxyl oxygen
+mass  10   1.008   # Hydroxyl hydrogen
+
+pair_coeff  6  6   9.0298e-07  4.90620  # fe2
+pair_coeff  7  7   9.0298e-07  4.90620  # fe3
+pair_coeff  8  8   0.1554      3.16554  # ob
+pair_coeff  9  9   0.1554      3.16554  # oh
+pair_coeff  10 10  0.0         0.0      # ho
+
+bond_coeff  5  554.1349  1.0   # oh-ho
+bond_coeff  6    0.0     2.08  # fe-oh (dummy bond)
+
+angle_coeff  6   30.0  109.470  # fe-oh-ho
+
+##################################################################################
+
+# Bottom oct_layer
+group bLayerFe3 id 319 249 339 192 198 142 212 99 22  # Fe3+ -> Fe2+
+9 atoms in group bLayerFe3
+
+# One oct above bottom oct_layer
+#group bLayerFe2 id 8 358 73 48 118 288 318 268 43  # Fe2+ -> Fe3+
+
+# Two oct above bottom oct_layer
+group bLayerFe2 id 13 33 87 203 223 323 177 297 343  # Fe2+ -> Fe3+
+9 atoms in group bLayerFe2
+
+set group bLayerFe3 type 6
+Setting atom values ...
+  9 settings made for type
+set group bLayerFe3 charge 1.05
+Setting atom values ...
+  9 settings made for charge
+
+set group bLayerFe2 type 7
+Setting atom values ...
+  9 settings made for type
+set group bLayerFe2 charge 1.575
+Setting atom values ...
+  9 settings made for charge
+
+group Fe type 6 7
+1224 atoms in group Fe
+
+region bottomFe block INF INF INF INF INF -28.5
+group bottomFe region bottomFe
+108 atoms in group bottomFe
+group bFe intersect bottomFe Fe
+36 atoms in group bFe
+
+#region bottom1Fe block INF INF INF INF -27.8 -26.5
+#group bottom1Fe region bottom1Fe
+#group b1Fe intersect bottom1Fe Fe
+
+region bottom2Fe block INF INF INF INF -25.5 -25
+group bottom2Fe region bottom2Fe
+108 atoms in group bottom2Fe
+group b2Fe intersect bottom2Fe Fe
+36 atoms in group b2Fe
+
+label minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b2Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 855824 ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 855824 50000 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 324
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29588697
+  grid = 45 45 200
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00034195275
+  estimated relative force accuracy = 1.0297805e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 591948 405000
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 4 4 11
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 71.7 | 71.7 | 71.7 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+       0        50000   -538153.37            0            0 
+     100        50000   -538009.88          100           82 
+     200        50000   -538039.23          200          169 
+     300        50000   -537874.62          300          262 
+     324        50000   -538004.68          324          285 
+Loop time of 95.819 on 1 procs for 324 steps with 2925 atoms
+
+Performance: 0.146 ns/day, 164.299 hours/ns, 3.381 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.0061     | 5.0061     | 5.0061     |   0.0 |  5.22
+Bond    | 0.0021106  | 0.0021106  | 0.0021106  |   0.0 |  0.00
+Kspace  | 20.369     | 20.369     | 20.369     |   0.0 | 21.26
+Neigh   | 7.2006     | 7.2006     | 7.2006     |   0.0 |  7.51
+Comm    | 0.058331   | 0.058331   | 0.058331   |   0.0 |  0.06
+Output  | 0.00010909 | 0.00010909 | 0.00010909 |   0.0 |  0.00
+Modify  | 63.175     | 63.175     | 63.175     |   0.0 | 65.93
+Other   |            | 0.007021   |            |       |  0.01
+
+Nlocal:           2925 ave        2925 max        2925 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10057 ave       10057 max       10057 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.40177e+06 ave 1.40177e+06 max 1.40177e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1401769
+Ave neighs/atom = 479.23726
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 648
+Dangerous builds = 0
+
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b2Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 710414 ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 710414 45000 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 324
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29588697
+  grid = 45 45 200
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00034195275
+  estimated relative force accuracy = 1.0297805e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 591948 405000
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 71.7 | 71.7 | 71.7 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+     324        45000   -538004.68            0            0 
+     400        45000   -538111.68           76           59 
+     500        45000   -537900.91          176          144 
+     600        45000   -538086.31          276          228 
+     648        45000   -538044.93          324          268 
+Loop time of 97.9616 on 1 procs for 324 steps with 2925 atoms
+
+Performance: 0.143 ns/day, 167.973 hours/ns, 3.307 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.061      | 5.061      | 5.061      |   0.0 |  5.17
+Bond    | 0.0021414  | 0.0021414  | 0.0021414  |   0.0 |  0.00
+Kspace  | 20.966     | 20.966     | 20.966     |   0.0 | 21.40
+Neigh   | 7.2614     | 7.2614     | 7.2614     |   0.0 |  7.41
+Comm    | 0.058116   | 0.058116   | 0.058116   |   0.0 |  0.06
+Output  | 0.00019515 | 0.00019515 | 0.00019515 |   0.0 |  0.00
+Modify  | 64.606     | 64.606     | 64.606     |   0.0 | 65.95
+Other   |            | 0.007073   |            |       |  0.01
+
+Nlocal:           2925 ave        2925 max        2925 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10057 ave       10057 max       10057 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.40177e+06 ave 1.40177e+06 max 1.40177e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1401769
+Ave neighs/atom = 479.23726
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 648
+Dangerous builds = 0
+
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b2Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 755762 ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 755762 40500 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 324
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29588697
+  grid = 45 45 200
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00034195275
+  estimated relative force accuracy = 1.0297805e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 591948 405000
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 71.7 | 71.7 | 71.7 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+     648        40500   -538044.93            0            0 
+     700        40500   -538091.39           52           41 
+     800        40500   -538025.88          152          121 
+     900        40500    -537995.7          252          209 
+     972        40500   -537993.06          324          269 
+Loop time of 97.6764 on 1 procs for 324 steps with 2925 atoms
+
+Performance: 0.143 ns/day, 167.484 hours/ns, 3.317 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.0775     | 5.0775     | 5.0775     |   0.0 |  5.20
+Bond    | 0.0021416  | 0.0021416  | 0.0021416  |   0.0 |  0.00
+Kspace  | 20.931     | 20.931     | 20.931     |   0.0 | 21.43
+Neigh   | 7.273      | 7.273      | 7.273      |   0.0 |  7.45
+Comm    | 0.057524   | 0.057524   | 0.057524   |   0.0 |  0.06
+Output  | 9.7702e-05 | 9.7702e-05 | 9.7702e-05 |   0.0 |  0.00
+Modify  | 64.328     | 64.328     | 64.328     |   0.0 | 65.86
+Other   |            | 0.00711    |            |       |  0.01
+
+Nlocal:           2925 ave        2925 max        2925 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10057 ave       10057 max       10057 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.40177e+06 ave 1.40177e+06 max 1.40177e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1401769
+Ave neighs/atom = 479.23726
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 648
+Dangerous builds = 0
+
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b2Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 4574249 ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 4574249 36450 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 324
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29588697
+  grid = 45 45 200
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00034195275
+  estimated relative force accuracy = 1.0297805e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 591948 405000
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 71.7 | 71.7 | 71.7 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+     972        36450   -537993.06            0            0 
+    1000        36450   -538014.71           28           18 
+    1100        36450   -538038.43          128          101 
+    1200        36450   -538031.43          228          187 
+    1296        36450   -538041.49          324          264 
+Loop time of 97.0299 on 1 procs for 324 steps with 2925 atoms
+
+Performance: 0.144 ns/day, 166.375 hours/ns, 3.339 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.0567     | 5.0567     | 5.0567     |   0.0 |  5.21
+Bond    | 0.00206    | 0.00206    | 0.00206    |   0.0 |  0.00
+Kspace  | 20.497     | 20.497     | 20.497     |   0.0 | 21.12
+Neigh   | 7.2593     | 7.2593     | 7.2593     |   0.0 |  7.48
+Comm    | 0.059048   | 0.059048   | 0.059048   |   0.0 |  0.06
+Output  | 9.411e-05  | 9.411e-05  | 9.411e-05  |   0.0 |  0.00
+Modify  | 64.148     | 64.148     | 64.148     |   0.0 | 66.11
+Other   |            | 0.007107   |            |       |  0.01
+
+Nlocal:           2925 ave        2925 max        2925 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10057 ave       10057 max       10057 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.40177e+06 ave 1.40177e+06 max 1.40177e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1401769
+Ave neighs/atom = 479.23726
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 648
+Dangerous builds = 0
+
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b2Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 5979850 ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 5979850 32805 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 324
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29588697
+  grid = 45 45 200
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00034195275
+  estimated relative force accuracy = 1.0297805e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 591948 405000
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 71.7 | 71.7 | 71.7 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+    1296        32805   -538041.49            0            0 
+    1300        32805   -538047.33            4            2 
+    1400        32805   -537988.41          104           76 
+    1500        32805   -537972.05          204          150 
+    1600        32805   -538049.84          304          234 
+    1620        32805    -537998.5          324          250 
+Loop time of 99.4095 on 1 procs for 324 steps with 2925 atoms
+
+Performance: 0.141 ns/day, 170.455 hours/ns, 3.259 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.0953     | 5.0953     | 5.0953     |   0.0 |  5.13
+Bond    | 0.00213    | 0.00213    | 0.00213    |   0.0 |  0.00
+Kspace  | 21.477     | 21.477     | 21.477     |   0.0 | 21.60
+Neigh   | 7.3278     | 7.3278     | 7.3278     |   0.0 |  7.37
+Comm    | 0.058988   | 0.058988   | 0.058988   |   0.0 |  0.06
+Output  | 0.0001401  | 0.0001401  | 0.0001401  |   0.0 |  0.00
+Modify  | 65.441     | 65.441     | 65.441     |   0.0 | 65.83
+Other   |            | 0.007192   |            |       |  0.01
+
+Nlocal:           2925 ave        2925 max        2925 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10057 ave       10057 max       10057 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.40177e+06 ave 1.40177e+06 max 1.40177e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1401769
+Ave neighs/atom = 479.23726
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 648
+Dangerous builds = 0
+
+  unfix swp
+  thermo_style custom step temp pe
+
+next temp
+jump SELF minimize_temp
+
+  variable ftemp equal v_temp
+
+  # Electrostatic relaxation
+  fix swp b2Fe atom/swap 1 1 ${rand} ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 2707118 ${temp} ke no types 6 7
+  fix swp b2Fe atom/swap 1 1 2707118 29524 ke no types 6 7
+  thermo 100
+  thermo_style custom step v_ftemp pe f_swp[1] f_swp[2]
+  run ${nsteps}
+  run 324
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29588697
+  grid = 45 45 200
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00034195275
+  estimated relative force accuracy = 1.0297805e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 591948 405000
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Per MPI rank memory allocation (min/avg/max) = 71.7 | 71.7 | 71.7 Mbytes
+Step v_ftemp PotEng f_swp[1] f_swp[2] 
+    1620        29524    -537998.5            0            0 
+    1700        29524   -538049.39           80           55 
+    1800        29524   -538017.21          180          128 
+    1900        29524   -538040.08          280          201 
+    1944        29524   -538038.69          324          229 
+Loop time of 103.027 on 1 procs for 324 steps with 2925 atoms
+
+Performance: 0.136 ns/day, 176.658 hours/ns, 3.145 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.0671     | 5.0671     | 5.0671     |   0.0 |  4.92
+Bond    | 0.0022796  | 0.0022796  | 0.0022796  |   0.0 |  0.00
+Kspace  | 22.7       | 22.7       | 22.7       |   0.0 | 22.03
+Neigh   | 7.2893     | 7.2893     | 7.2893     |   0.0 |  7.08
+Comm    | 0.058505   | 0.058505   | 0.058505   |   0.0 |  0.06
+Output  | 0.00011932 | 0.00011932 | 0.00011932 |   0.0 |  0.00
+Modify  | 67.902     | 67.902     | 67.902     |   0.0 | 65.91
+Other   |            | 0.007304   |            |       |  0.01
+
+Nlocal:           2925 ave        2925 max        2925 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10057 ave       10057 max       10057 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.40177e+06 ave 1.40177e+06 max 1.40177e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1401769
+Ave neighs/atom = 479.23726
+Ave special neighs/atom = 0.043076923
+Neighbor list builds = 648
+Dangerous builds = 0

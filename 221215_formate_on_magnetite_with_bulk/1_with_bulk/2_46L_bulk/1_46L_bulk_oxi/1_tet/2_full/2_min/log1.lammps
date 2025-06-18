@@ -1,0 +1,202 @@
+LAMMPS (17 Feb 2022)
+variable layer index 21
+variable type string fa_tet_full_qeq
+variable rand equal round(random(0,1e7,452345))
+
+include settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/long 12.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+kspace_style       pppm 1.0e-6
+kspace_modify      slab 3.0
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+read_data 001-dbt_3x3_21L_${type}.data
+read_data 001-dbt_3x3_21L_fa_tet_full_qeq.data
+Reading data file ...
+  orthogonal box = (0 0 -64.778423) to (25.44 25.44 32.908)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  4356 atoms
+  reading velocities ...
+  4356 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning impropers ...
+  1 = max impropers/atom
+  reading bonds ...
+  72 bonds
+  reading angles ...
+  108 angles
+  reading impropers ...
+  18 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     3 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.011 seconds
+
+include ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass  1   12.011   # Sp2 C carbonyl group
+mass  2    1.008   # H bonded to non-sp3 carbon with 2 electrwd. group
+mass  3   15.9994  # Oxygen with one connected atom
+mass  4   15.9994  # Oxygen in hydroxyl group
+mass  5    1.008   # Hydroxyl group
+
+pair_coeff  1  1   0.0988  3.31521230994  # c
+pair_coeff  2  2   0.0161  2.44729877873  # h5
+pair_coeff  3  3   0.1463  3.04812087425  # o
+pair_coeff  4  4   0.0930  3.24287133403  # oh
+pair_coeff  5  5   0.0047  0.537924646013 # ho
+
+bond_coeff  1  361.80  1.105  # c-h5
+bond_coeff  2  652.57  1.218  # c=o
+bond_coeff  3  383.13  1.351  # c-oh
+bond_coeff  4  563.51  0.973  # o-h
+
+angle_coeff  1   51.617  106.550  # c-oh-ho
+angle_coeff  2   65.930  123.650  # h5-c=o
+angle_coeff  3   65.262  109.490  # h5-c-oh
+angle_coeff  4  115.745  122.100  # o=c-oh
+
+dihedral_coeff  1  1  2.3  2  180.0               # h5-c-oh-ho
+dihedral_coeff  2  2  2.3  2  180.0  1.9  1  0.0  # o=c-oh-ho
+
+                              #  h5
+                              #  |
+improper_coeff  1  10.5 -1 2  #  c
+                              # / \
+                              # o  oh
+
+#####################-----formate-----###########################################
+
+angle_coeff  5   118.817 130.250  # o-c-o
+
+                              #  h5
+                              #  |
+improper_coeff  2  10.5 -1 2  #  c
+                              # / \
+                              # o  o
+
+#####################-----magnetite-----#########################################
+
+mass  6   55.845   # Iron(II)
+mass  7   55.845   # Iron(III)
+mass  8   15.9994  # Bridging oxygen
+mass  9   15.9994  # Hydroxyl oxygen
+mass  10   1.008   # Hydroxyl hydrogen
+
+pair_coeff  6  6   9.0298e-07  4.90620  # fe2
+pair_coeff  7  7   9.0298e-07  4.90620  # fe3
+pair_coeff  8  8   0.1554      3.16554  # ob
+pair_coeff  9  9   0.1554      3.16554  # oh
+pair_coeff  10 10  0.0         0.0      # ho
+
+bond_coeff  5  554.1349  1.0   # oh-ho
+bond_coeff  6    0.0     2.08  # fe-oh (dummy bond)
+
+angle_coeff  6   30.0  109.470  # fe-oh-ho
+
+##################################################################################
+
+# Full minimization
+minimize 1.0e-6 1.0e-9 1000 10000
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29499882
+  grid = 45 45 250
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00038505019
+  estimated relative force accuracy = 1.1595672e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 737748 506250
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 4 4 14
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 98.88 | 98.88 | 98.88 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0    -791204.5     225.3616   -790979.14    448.73566 
+     170            0   -810034.42    125.23214   -809909.19    4170.1834 
+Loop time of 37.6297 on 1 procs for 170 steps with 4356 atoms
+
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+     -790979.136865245  -809908.453967258  -809909.192056776
+  Force two-norm initial, final = 5058.8049 35.17016
+  Force max component initial, final = 174.08278 5.9377762
+  Final line search alpha, max atom move = 0.0053115444 0.031538762
+  Iterations, force evaluations = 170 330
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 11.934     | 11.934     | 11.934     |   0.0 | 31.71
+Bond    | 0.0031583  | 0.0031583  | 0.0031583  |   0.0 |  0.01
+Kspace  | 25.399     | 25.399     | 25.399     |   0.0 | 67.50
+Neigh   | 0.24497    | 0.24497    | 0.24497    |   0.0 |  0.65
+Comm    | 0.024687   | 0.024687   | 0.024687   |   0.0 |  0.07
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.02399    |            |       |  0.06
+
+Nlocal:           4356 ave        4356 max        4356 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          14899 ave       14899 max       14899 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     2.1493e+06 ave  2.1493e+06 max  2.1493e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2149301
+Ave neighs/atom = 493.41162
+Ave special neighs/atom = 0.05785124
+Neighbor list builds = 7
+Dangerous builds = 0
+
+write_data 001-dbt_3x3_${layer}L_${type}_min.data
+write_data 001-dbt_3x3_21L_${type}_min.data
+write_data 001-dbt_3x3_21L_fa_tet_full_qeq_min.data
+System init for write_data ...
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.29499882
+  grid = 45 45 250
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.00038505019
+  estimated relative force accuracy = 1.1595672e-06
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 737748 506250
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Total wall time: 0:00:37

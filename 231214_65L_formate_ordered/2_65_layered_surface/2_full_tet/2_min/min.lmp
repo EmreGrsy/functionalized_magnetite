@@ -1,0 +1,17 @@
+variable layer index 65
+variable type string fa_tet_full_ordered_qeq
+variable rand equal round(random(0,1e7,452345))
+
+include settings.lmp
+
+read_data 001-dbt_3x3_${layer}L_${type}.data
+
+include ff_formic_acid_fe304.param
+
+# Full minimization
+minimize  1.0e-6 1.0e-9 1000 10000
+min_modify integrator eulerexplicit tmax 10.0 tmin 0.0 delaystep 5 &
+          dtgrow 1.1 dtshrink 0.5 alpha0 0.1 alphashrink 0.99 &
+          vdfmax 100000 halfstepback no initialdelay no
+
+write_data 001-dbt_3x3_${layer}L_${type}_min.data

@@ -1,0 +1,6 @@
+REMARK original generated coordinate pdb file
+ATOM      1  C1  FORAF   1       0.258   1.164  -0.000  0.00  0.00      A    C
+ATOM      2  O2  FORAF   1      -0.742   1.164  -0.000  1.00  0.00      A    O
+ATOM      3  O3  FORAF   1       0.758   2.030  -0.000  0.00  0.00      A    O
+ATOM      4  H4  FORAF   1       0.758   0.298   0.000  0.00  0.00      A    H
+END

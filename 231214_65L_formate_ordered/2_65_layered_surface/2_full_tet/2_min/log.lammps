@@ -1,0 +1,6 @@
+LAMMPS (17 Feb 2022)
+# Symmetrical 001 layers: 17, 21, 25, 29, 33, 37, 41
+
+package require topotools
+ERROR: Illegal package command (../input.cpp:1657)
+Last command: package require topotools

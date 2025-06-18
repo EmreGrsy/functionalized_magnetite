@@ -1,0 +1,312 @@
+variable layer index 17
+
+variable  q2  equal  1.050
+variable  q3  equal  1.575
+variable  qoh equal -0.975
+variable  qho equal  0.425
+
+variable  Fe2 equal 6           # iron(II) type
+variable  Fe3 equal 7           # iron(III) type
+variable  Ob equal  8           # bridging oxygen type
+variable  Oh equal  9           # surface hydroxyl oxygen type
+variable  Ho equal 10           # hydroxyl hydrogen type
+
+variable  hydrox_bond  equal 5  # hydroxyl bond type
+variable  hydrox_angle equal 6  # hydroxyl angle type
+variable  dummy_bond   equal 6  # dummy fe-oh bond type
+
+variable  rand equal round(random(0,1e7,452345))
+  
+label loop
+
+  include  settings.lmp
+  read_data 001-dbt_1x1_${layer}L_init.data &
+                  extra/atom/types 2 &
+                  extra/bond/types 2 &
+                  extra/angle/types 2 &
+                  extra/improper/types 1 &
+                  extra/bond/per/atom 4 &
+                  extra/angle/per/atom 8 &
+                  extra/dihedral/per/atom 2 &
+                  extra/improper/per/atom 1 &
+                  extra/special/per/atom 20
+  
+  include  ff_formic_acid_fe304.param
+  
+  change_box	all z final -100.0 100.0
+  
+  variable natoms equal atoms
+
+  group fe type ${Fe2} ${Fe3}
+
+  # distance between top and bottom fe layers
+  variable fe_zmax equal bound(fe,zmax)
+  variable fe_zmin equal bound(fe,zmin)
+  variable dist_slab equal ${fe_zmax}+${fe_zmin}
+  
+  ##
+  ## formate creation / half-coverage
+  ##
+  
+  ## top slab
+  variable zto equal ${fe_zmax}+1.889
+  variable ztc equal ${zto}+0.7
+  variable zth equal ${zto}+1.8
+
+  create_atoms	1 single 1.318 5.558 ${ztc}	# c
+  variable c equal ${natoms}
+  create_atoms	2 single 1.318 5.558 ${zth}	# h5
+  variable h equal ${natoms}
+  create_atoms	3 single 2.378 6.618 ${zto}	# o
+  variable o1 equal ${natoms}
+  create_atoms	3 single 0.258 4.498 ${zto}	# o
+  variable o2 equal ${natoms}
+
+  set  atom ${c}  charge  0.731
+  set  atom ${h}  charge -0.123
+  set  atom ${o1} charge -0.804
+  set  atom ${o2} charge -0.804
+  
+  create_bonds	single/bond 1 ${c} ${h}
+  create_bonds	single/bond 2 ${c} ${o1}
+  create_bonds	single/bond 2 ${c} ${o2}
+  
+  create_bonds	single/angle 5 ${o1} ${c} ${o2}
+  create_bonds	single/angle 2 ${h} ${c} ${o2}
+  create_bonds	single/angle 2 ${h} ${c} ${o1}
+  
+  create_bonds	single/improper 2 ${o1} ${h} ${c} ${o2}
+  
+  # hydroxyl hydrogen creation
+  variable ztho equal ${fe_zmax}+0.482
+
+  create_atoms	${Ho} single 5.3 5.7 ${ztho} # ho/129
+  variable  ho equal ${natoms}
+  set  atom ${ho} charge ${qho}
+
+  # second hydrogen to avoid charge transfer to the slab
+  create_atoms ${Ho} single 3.18 3.58 ${ztho} 
+  variable 2nd_ho equal ${natoms}
+  set atom ${2nd_ho} charge ${qho}
+
+  ## bottom slab
+  
+  variable zbo equal ${fe_zmin}-1.889
+  variable zbc equal ${zbo}-0.7
+  variable zbh equal ${zbo}-1.8
+
+  create_atoms	1 single 1.318 5.558 ${zbc}	# c
+  variable c2 equal ${natoms}
+  create_atoms	2 single 1.318 5.558 ${zbh}	# h5
+  variable h2 equal ${natoms}
+  create_atoms	3 single 2.378 6.618 ${zbo}	# o
+  variable o21 equal ${natoms}
+  create_atoms	3 single 0.258 4.498 ${zbo}	# o
+  variable o22 equal ${natoms} 
+  
+  set  atom ${c2}  charge  0.731
+  set  atom ${h2}  charge -0.123
+  set  atom ${o21} charge -0.804
+  set  atom ${o22} charge -0.804
+  
+  create_bonds single/bond 1 ${c2} ${h2}
+  create_bonds single/bond 2 ${c2} ${o21}
+  create_bonds single/bond 2 ${c2} ${o22}
+  
+  create_bonds	single/angle 5 ${o21} ${c2} ${o22}
+  create_bonds	single/angle 2 ${h2} ${c2} ${o22}
+  create_bonds	single/angle 2 ${h2} ${c2} ${o21}
+  
+  create_bonds	single/improper 2 ${o21} ${h2} ${c2} ${o22}
+
+  ## hydroxyl hydrogen creation
+  variable zbho equal ${fe_zmin}-0.482
+  create_atoms	${Ho} single 5.3 5.7 ${zbho} # ho/129
+  variable  h2o equal ${natoms}
+  set  atom ${h2o} charge ${qho}
+
+  create_atoms ${Ho} single 3.18 3.58 ${zbho}
+  variable 2nd_ho_b1 equal ${natoms}
+  set atom ${2nd_ho_b1} charge ${qho}
+
+  ##
+  ## formate creation / full-coverage
+  ##
+  
+  # push unit cell
+  displace_atoms  all move -4.417239 4.261023 0.0 units box
+  
+  create_atoms  1 single 1.318 5.558 ${ztc} # c
+  variable c equal ${natoms}
+  create_atoms  2 single 1.318 5.558 ${zth} # h5
+  variable h equal ${natoms}
+  create_atoms  3 single 2.378 6.618 ${zto} # o
+  variable o1 equal ${natoms}
+  create_atoms  3 single 0.258 4.498 ${zto} # o
+  variable o2 equal ${natoms}
+  
+  set atom ${c}  charge  0.731
+  set atom ${h}  charge -0.123
+  set atom ${o1} charge -0.804
+  set atom ${o2} charge -0.804
+  
+  create_bonds single/bond 1 ${c} ${h}
+  create_bonds single/bond 2 ${c} ${o1}
+  create_bonds single/bond 2 ${c} ${o2}
+  
+  create_bonds single/angle 5 ${o1} ${c} ${o2}
+  create_bonds single/angle 2 ${h} ${c} ${o2}
+  create_bonds single/angle 2 ${h} ${c} ${o1}
+  
+  create_bonds single/improper 2 ${o1} ${h} ${c} ${o2}
+  
+  # hydroxyl hydrogen creation
+  create_atoms ${Ho} single 5.3 5.7 ${ztho} # ho
+  variable ho equal ${natoms}
+  set atom ${ho} charge ${qho}
+
+  # second hydrogen to avoid charge transfer to the slab
+  create_atoms ${Ho} single 3.18 3.58 ${ztho} 
+  variable 2nd_ho equal ${natoms}
+  set atom ${2nd_ho} charge ${qho}
+
+  ## bottom slab
+  create_atoms 1 single 1.318 5.558 ${zbc} # c
+  variable c3 equal ${natoms}
+  create_atoms 2 single 1.318 5.558 ${zbh} # h5
+  variable h3 equal ${natoms}
+  create_atoms 3 single 2.378 6.618 ${zbo} # o
+  variable o31 equal ${natoms}
+  create_atoms 3 single 0.258 4.498 ${zbo} # o
+  variable o32 equal ${natoms}
+
+  set atom ${c3}  charge  0.731
+  set atom ${h3}  charge -0.123
+  set atom ${o31} charge -0.804
+  set atom ${o32} charge -0.804
+
+  create_bonds single/bond 1 ${c3} ${h3}
+  create_bonds single/bond 2 ${c3} ${o31}
+  create_bonds single/bond 2 ${c3} ${o32}
+
+  create_bonds single/angle 5 ${o31} ${c3} ${o32}
+  create_bonds single/angle 2 ${h3} ${c3} ${o32}
+  create_bonds single/angle 2 ${h3} ${c3} ${o31}
+
+  create_bonds single/improper 2 ${o31} ${h3} ${c3} ${o32}
+
+  ## hydroxyl hydrogen creation
+  create_atoms ${Ho} single 5.3 5.7 ${zbho} # ho/129
+  variable h3o equal ${natoms}
+  set atom ${h3o} charge ${qho}
+
+  create_atoms ${Ho} single 3.18 3.58 ${zbho}
+  variable 2nd_ho_b2 equal ${natoms}
+  set atom ${2nd_ho_b2} charge ${qho}
+
+
+  group boh id ${h2o} ${h3o} 
+  group boh2 id ${2nd_ho_b1} ${2nd_ho_b2} 
+  group bcooh id ${c2} ${h2} ${o21} ${o22} ${c3} ${h3} ${o31} ${o32}
+  
+  displace_atoms boh move -3.72 3.72 0.0 units box
+  displace_atoms boh2 move -3.72 3.72 0.0 units box
+  displace_atoms bcooh move 2.12 2.12 0.0 units box
+  
+  ##
+  ## hydroxyl bonds and angles creation
+  ##
+  
+  # hydroxyl bonds
+  group ho type ${Ho} 
+  group ob type ${Ob}
+  create_bonds  many ho ob ${hydrox_bond} 1.0 1.75
+  
+  # hydroxyl angles
+  compute nbonds ob property/atom nbonds
+  dump nbonds ob custom 1 dump.nbonds id c_nbonds
+  variable ob2oh atom c_nbonds>0
+  run 0
+  group ob2oh variable ob2oh
+  set group ob2oh type ${Oh}
+  set group ob2oh charge ${qoh}
+  
+  group oh type ${Oh}
+  group fe type ${Fe2} ${Fe3}
+  group feoh type ${Oh} ${Fe2} ${Fe3}
+
+  ##
+  ##  constrain fe_tet to 3+
+  ##
+
+  compute coord fe coord/atom cutoff 2.0
+  dump coord fe custom 1 fe_${layer}L.coord id type c_coord
+  dump_modify coord sort id
+  run 0
+  variable fet atom c_coord==4
+  group fet variable fet
+  group feo subtract fe fet
+  undump coord
+
+  group o type ${Oh} ${Ob} 
+
+  variable nFeO equal count(feo)
+  variable nFeT equal count(fet)
+  variable nO equal count(o)
+
+  variable r equal ${nFeO}-round(${nFeO}*(${nFeT}*${q3}+${nFeO}*${q3}-${nO}*${q2})/(${nFeO}*${q3}-${nFeO}*${q2}))
+  
+  # reset all charges of FeO to Fe(II) (1.050e)
+  set group feo type 6
+  set group feo charge ${q2}
+
+  # ... and set some random subset of FeO and all FeT to Fe(III) (1.575e)
+  set group feo type/subset 7 $r ${rand}
+  set type 7 charge ${q3}
+  set group fet charge ${q3}
+  set group fet type 7
+
+  ##
+  ## charge neutralization 
+  ## 
+  
+  # via changing the charge (and type) of one Fe(II) to Fe(III) per formate
+#  group fe2 type 6
+#  set group fe2 type/subset 7 4 ${rand}
+#  set type 7 charge ${q3}
+#  group fe2 delete
+  
+  reset_atom_ids sort yes
+
+  # Rearange simulation box.
+  variable zmax equal bound(all,zmax)+20
+  variable zmin equal bound(all,zmin)-20
+
+  change_box all z final ${zmin} ${zmax} units box
+
+  # Sanity check
+  variable qtot equal charge(all)
+  print "total charge of the system : ${qtot}"
+
+  # shift the slab and ho so that the formates are located at the int binding site
+  group mag type 6 7 8 9 10
+  displace_atoms mag move -2.12 -2.12 0.0 units box
+
+  replicate 3 3 1 
+ 
+  # dummy bonds will be deleted after angle creation
+  fix  bonds all bond/create 1 ${Oh} ${Fe3} 2.1 ${dummy_bond} atype ${hydrox_angle}
+  run  500 # corresponds to max number of bonds created between fe3-oh
+  fix  bonds all bond/create 1 ${Oh} ${Fe2} 2.1 ${dummy_bond} atype ${hydrox_angle}
+  run  500 # corresponds to max number of bonds created between fe2-oh
+  unfix  bonds
+  # remove unneccessary fe-oh-fe angles and dummy fe-oh bonds
+  delete_bonds  all bond ${dummy_bond} remove
+  delete_bonds  feoh angle ${hydrox_angle} remove
+
+  write_data  001-dbt_3x3_${layer}L_fa_int_full_init.data
+
+  clear
+
+next layer
+jump SELF loop

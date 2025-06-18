@@ -1,0 +1,67 @@
+variable        rand equal round(random(0,1e7,452345))
+include		settings.lmp
+
+read_data	fa_on_001_wrapped.data
+
+include		ff_formic_acid_fe304.param
+
+dump            dmp all custom 1000 swap.lammpstrj id type q x y z
+dump_modify     dmp sort id
+
+replicate	3 3 1
+####------------ Initial relaxation of the system-----------###############
+fix		nve all nve
+thermo		100
+thermo_style	custom step temp pe
+run		4000000				# 2ns run
+unfix		nve
+variable	t equal temp
+
+write_data	noice.data
+quit
+#####----------electrostatic relaxation with mc swaps--------------########
+group           Fe type 7 6
+fix             swp Fe atom/swap 1 100 ${rand} ${t} types 6 7
+thermo          1000
+thermo_style    custom step temp pe f_swp[1] f_swp[2]
+run             2000000				# 1ns
+unfix		swp
+
+####----------cool down to 0K--------------------------------############
+variable        t equal temp
+fix		nvt all nvt temp ${t} 0.0001 $(100*dt)
+thermo		1000
+thermo_style    custom step temp press pe lz 
+run		20000000			# 10ns
+write_data	fa_on_001_3.data
+unfix nvt
+
+#####----------electrostatic relaxation with mc swaps--------------########
+fix             swp Fe atom/swap 1 100 ${rand} 0.0 types 6 7
+thermo          1000
+thermo_style    custom step temp pe f_swp[1] f_swp[2]
+run             2000000		
+write_data	fa_on_001_4.data
+
+####----------minimize formate-------------------------------------#######
+group		immobile type 2 9 10
+fix		freeze immobile setforce 0.0 0.0 0.0
+minimize	1.0e-6 1.0e-9 1000 10000
+thermo		1000
+thermo_style    custom step temp pe
+unfix		swp
+unfix		freeze
+write_data	fa_on_001_5.data
+
+########-----electrostatic relaxation wit mc swaps------------###########
+fix             swp Fe atom/swap 1 100 ${rand} 0.0 types 6 7
+thermo          10000
+thermo_style    custom step temp pe f_swp[1] f_swp[2]
+run             200000
+
+#######------ minimize full structure----------------------------########
+minimize	1.0e-6 1.0e-9 1000 10000
+thermo_style    custom step temp pe
+unfix		swp
+
+write_data	fa_on_001_min.data

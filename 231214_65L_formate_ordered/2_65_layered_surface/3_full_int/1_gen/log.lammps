@@ -1,0 +1,1074 @@
+LAMMPS (17 Feb 2022)
+variable layer index 65
+
+variable  q3  equal  1.575
+variable  qoh equal -1.000
+variable  qho equal  0.425
+
+variable  Fe2 equal 6           # iron(II) type
+variable  Fe3 equal 7           # iron(III) type
+variable  Ob equal  8           # bridging oxygen type
+variable  Oh equal  9           # surface hydroxyl oxygen type
+variable  Ho equal 10           # hydroxyl hydrogen type
+
+variable  hydrox_bond  equal 5  # hydroxyl bond type
+variable  hydrox_angle equal 6  # hydroxyl angle type
+variable  dummy_bond   equal 6  # dummy fe-oh bond type
+
+variable boffset equal 12  # Simulation box offset to contain coul realspace cutoff.
+
+variable  rand equal round(random(0,1e7,452345))
+
+label loop
+
+  include  settings.lmp
+units              real
+atom_style         full
+timestep	   0.5
+boundary	   p p f
+
+pair_style         lj/cut/coul/cut 12.0
+bond_style         harmonic
+angle_style        harmonic
+dihedral_style     fourier
+improper_style     cvff
+
+pair_modify        mix arithmetic
+special_bonds      amber
+neighbor           2.0 bin
+neigh_modify       every 1 delay 0 check yes
+  read_data b-001-dbt_1x1_65L_ordered.data                   extra/atom/types 2                   extra/bond/types 2                   extra/angle/types 2                   extra/improper/types 1                   extra/bond/per/atom 4                   extra/angle/per/atom 8                   extra/dihedral/per/atom 2                   extra/improper/per/atom 1                   extra/special/per/atom 5
+Reading data file ...
+  orthogonal box = (0.239999 0.239999 0.258414) to (8.719999 8.719999 85.058417)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  460 atoms
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     0 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.002 seconds
+
+  include  ff_formic_acid_fe304.param
+#####################-----formic_acid-----######################################
+
+mass  1   12.011   # Sp2 C carbonyl group
+mass  2    1.008   # H bonded to non-sp3 carbon with 2 electrwd. group
+mass  3   15.9994  # Oxygen with one connected atom
+mass  4   15.9994  # Oxygen in hydroxyl group
+mass  5    1.008   # Hydroxyl group
+
+pair_coeff  1  1   0.0988  3.31521230994  # c
+pair_coeff  2  2   0.0161  2.44729877873  # h5
+pair_coeff  3  3   0.1463  3.04812087425  # o
+pair_coeff  4  4   0.0930  3.24287133403  # oh
+pair_coeff  5  5   0.0047  0.537924646013 # ho
+
+bond_coeff  1  361.80  1.105  # c-h5
+bond_coeff  2  652.57  1.218  # c=o
+bond_coeff  3  383.13  1.351  # c-oh
+bond_coeff  4  563.51  0.973  # o-h
+
+angle_coeff  1   51.617  106.550  # c-oh-ho
+angle_coeff  2   65.930  123.650  # h5-c=o
+angle_coeff  3   65.262  109.490  # h5-c-oh
+angle_coeff  4  115.745  122.100  # o=c-oh
+
+dihedral_coeff  1  1  2.3  2  180.0               # h5-c-oh-ho
+dihedral_coeff  2  2  2.3  2  180.0  1.9  1  0.0  # o=c-oh-ho
+
+                              #  h5
+                              #  |
+improper_coeff  1  10.5 -1 2  #  c
+                              # / \
+                              # o  oh
+
+#####################-----formate-----###########################################
+
+angle_coeff  5   118.817 130.250  # o-c-o
+
+                              #  h5
+                              #  |
+improper_coeff  2  10.5 -1 2  #  c
+                              # / \
+                              # o  o
+
+#####################-----magnetite-----#########################################
+
+mass  6   55.845   # Iron(II)
+mass  7   55.845   # Iron(III)
+mass  8   15.9994  # Bridging oxygen
+mass  9   15.9994  # Hydroxyl oxygen
+mass  10   1.008   # Hydroxyl hydrogen
+
+pair_coeff  6  6   9.0298e-07  4.90620  # fe2
+pair_coeff  7  7   9.0298e-07  4.90620  # fe3
+pair_coeff  8  8   0.1554      3.16554  # ob
+pair_coeff  9  9   0.1554      3.16554  # oh
+pair_coeff  10 10  0.0         0.0      # ho
+
+bond_coeff  5  554.1349  1.0   # oh-ho
+bond_coeff  6    0.0     2.08  # fe-oh (dummy bond)
+
+angle_coeff  6   30.0  109.470  # fe-oh-ho
+
+##################################################################################
+
+  # Modify the slab location to fit this script
+  displace_atoms all move 0 0 -56.893526 units box
+Displacing atoms ...
+  displace_atoms all move 0 0 -2.45542526245 units box
+Displacing atoms ...
+
+  change_box	all z final -100.0 100.0
+Changing box ...
+  orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+
+  variable natoms equal atoms
+
+  ##
+  ## formate creation / half-coverage
+  ##
+
+  create_atoms	1 single 1.318 5.558 19.808	# c
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable c equal ${natoms}
+  variable c equal 461
+  create_atoms	2 single 1.318 5.558 20.908	# h5
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable h equal ${natoms}
+  variable h equal 462
+  create_atoms	3 single 2.378 6.618 19.108	# o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o1 equal ${natoms}
+  variable o1 equal 463
+  create_atoms	3 single 0.258 4.498 19.108	# o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o2 equal ${natoms}
+  variable o2 equal 464
+
+  set  atom ${c}  charge  0.731
+  set  atom 461  charge  0.731
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${h}  charge -0.123
+  set  atom 462  charge -0.123
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o1} charge -0.804
+  set  atom 463 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o2} charge -0.804
+  set  atom 464 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+
+  create_bonds	single/bond 1 ${c} ${h}
+  create_bonds	single/bond 1 461 ${h}
+  create_bonds	single/bond 1 461 462
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     1 = max # of 1-2 neighbors
+     0 = max # of 1-3 neighbors
+     0 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/bond 2 ${c} ${o1}
+  create_bonds	single/bond 2 461 ${o1}
+  create_bonds	single/bond 2 461 463
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     2 = max # of 1-2 neighbors
+     1 = max # of 1-3 neighbors
+     1 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/bond 2 ${c} ${o2}
+  create_bonds	single/bond 2 461 ${o2}
+  create_bonds	single/bond 2 461 464
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds	single/angle 5 ${o1} ${c} ${o2}
+  create_bonds	single/angle 5 463 ${c} ${o2}
+  create_bonds	single/angle 5 463 461 ${o2}
+  create_bonds	single/angle 5 463 461 464
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/angle 2 ${h} ${c} ${o2}
+  create_bonds	single/angle 2 462 ${c} ${o2}
+  create_bonds	single/angle 2 462 461 ${o2}
+  create_bonds	single/angle 2 462 461 464
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/angle 2 ${h} ${c} ${o1}
+  create_bonds	single/angle 2 462 ${c} ${o1}
+  create_bonds	single/angle 2 462 461 ${o1}
+  create_bonds	single/angle 2 462 461 463
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds	single/improper 2 ${o1} ${h} ${c} ${o2}
+  create_bonds	single/improper 2 463 ${h} ${c} ${o2}
+  create_bonds	single/improper 2 463 462 ${c} ${o2}
+  create_bonds	single/improper 2 463 462 461 ${o2}
+  create_bonds	single/improper 2 463 462 461 464
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  ## hydroxyl hydrogen creation
+
+  create_atoms	${Ho} single 5.3 5.7 17.7 # ho/129
+  create_atoms	10 single 5.3 5.7 17.7 
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable  ho equal ${natoms}
+  variable  ho equal 465
+  set  atom ${ho} charge ${qho}
+  set  atom 465 charge ${qho}
+  set  atom 465 charge 0.425
+Setting atom values ...
+  1 settings made for charge
+
+  # Modify the slab location to fit this script
+  displace_atoms all move 0 0 33.897898 units box
+Displacing atoms ...
+
+  # bottom slab
+  create_atoms	1 single 1.318 5.558 -19.291176	# c
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable c2 equal ${natoms}
+  variable c2 equal 466
+  create_atoms	2 single 1.318 5.558 -20.391176	# h5
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable h2 equal ${natoms}
+  variable h2 equal 467
+  create_atoms	3 single 2.378 6.618 -18.591176	# o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o21 equal ${natoms}
+  variable o21 equal 468
+  create_atoms	3 single 0.258 4.498 -18.591176	# o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o22 equal ${natoms}
+  variable o22 equal 469
+
+  set  atom ${c2}  charge  0.731
+  set  atom 466  charge  0.731
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${h2}  charge -0.123
+  set  atom 467  charge -0.123
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o21} charge -0.804
+  set  atom 468 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o22} charge -0.804
+  set  atom 469 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+
+  create_bonds	single/bond 1 ${c2} ${h2}
+  create_bonds	single/bond 1 466 ${h2}
+  create_bonds	single/bond 1 466 467
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/bond 2 ${c2} ${o21}
+  create_bonds	single/bond 2 466 ${o21}
+  create_bonds	single/bond 2 466 468
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/bond 2 ${c2} ${o22}
+  create_bonds	single/bond 2 466 ${o22}
+  create_bonds	single/bond 2 466 469
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds	single/angle 5 ${o21} ${c2} ${o22}
+  create_bonds	single/angle 5 468 ${c2} ${o22}
+  create_bonds	single/angle 5 468 466 ${o22}
+  create_bonds	single/angle 5 468 466 469
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/angle 2 ${h2} ${c2} ${o22}
+  create_bonds	single/angle 2 467 ${c2} ${o22}
+  create_bonds	single/angle 2 467 466 ${o22}
+  create_bonds	single/angle 2 467 466 469
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/angle 2 ${h2} ${c2} ${o21}
+  create_bonds	single/angle 2 467 ${c2} ${o21}
+  create_bonds	single/angle 2 467 466 ${o21}
+  create_bonds	single/angle 2 467 466 468
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds	single/improper 2 ${o21} ${h2} ${c2} ${o22}
+  create_bonds	single/improper 2 468 ${h2} ${c2} ${o22}
+  create_bonds	single/improper 2 468 467 ${c2} ${o22}
+  create_bonds	single/improper 2 468 467 466 ${o22}
+  create_bonds	single/improper 2 468 467 466 469
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  ## hydroxyl hydrogen creation
+
+  create_atoms	${Ho} single 5.3 5.7 -17.456845 # ho/129
+  create_atoms	10 single 5.3 5.7 -17.456845 
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable  h2o equal ${natoms}
+  variable  h2o equal 470
+  set  atom ${h2o} charge ${qho}
+  set  atom 470 charge ${qho}
+  set  atom 470 charge 0.425
+Setting atom values ...
+  1 settings made for charge
+
+  ##
+  ## formate creation / full-coverage
+  #
+
+  # Modify the slab location to fit this script
+  displace_atoms all move 0 0 -33.897898 units box
+Displacing atoms ...
+  displace_atoms  all move -4.417239 4.261023 0.0 units box
+Displacing atoms ...
+
+  create_atoms  1 single 1.318 5.558 19.808 # c
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable c1 equal ${natoms}
+  variable c1 equal 471
+  create_atoms  2 single 1.318 5.558 20.908 # h5
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable h1 equal ${natoms}
+  variable h1 equal 472
+  create_atoms  3 single 2.378 6.618 19.108 # o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o11 equal ${natoms}
+  variable o11 equal 473
+  create_atoms  3 single 0.258 4.498 19.108 # o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o12 equal ${natoms}
+  variable o12 equal 474
+
+  set  atom ${c1}  charge  0.731
+  set  atom 471  charge  0.731
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${h1}  charge -0.123
+  set  atom 472  charge -0.123
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o11} charge -0.804
+  set  atom 473 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o12} charge -0.804
+  set  atom 474 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+
+  create_bonds	single/bond 1 ${c1} ${h1}
+  create_bonds	single/bond 1 471 ${h1}
+  create_bonds	single/bond 1 471 472
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/bond 2 ${c1} ${o11}
+  create_bonds	single/bond 2 471 ${o11}
+  create_bonds	single/bond 2 471 473
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/bond 2 ${c1} ${o12}
+  create_bonds	single/bond 2 471 ${o12}
+  create_bonds	single/bond 2 471 474
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds	single/angle 5 ${o11} ${c1} ${o12}
+  create_bonds	single/angle 5 473 ${c1} ${o12}
+  create_bonds	single/angle 5 473 471 ${o12}
+  create_bonds	single/angle 5 473 471 474
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/angle 2 ${h1} ${c1} ${o12}
+  create_bonds	single/angle 2 472 ${c1} ${o12}
+  create_bonds	single/angle 2 472 471 ${o12}
+  create_bonds	single/angle 2 472 471 474
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds	single/angle 2 ${h1} ${c1} ${o11}
+  create_bonds	single/angle 2 472 ${c1} ${o11}
+  create_bonds	single/angle 2 472 471 ${o11}
+  create_bonds	single/angle 2 472 471 473
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds	single/improper 2 ${o11} ${h1} ${c1} ${o12}
+  create_bonds	single/improper 2 473 ${h1} ${c1} ${o12}
+  create_bonds	single/improper 2 473 472 ${c1} ${o12}
+  create_bonds	single/improper 2 473 472 471 ${o12}
+  create_bonds	single/improper 2 473 472 471 474
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  ## hydroxyl hydrogen creation
+
+  create_atoms  ${Ho} single 5.3 5.7 17.7 # ho
+  create_atoms  10 single 5.3 5.7 17.7 
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable  ho1 equal ${natoms}
+  variable  ho1 equal 475
+  set  atom ${ho1} charge ${qho}
+  set  atom 475 charge ${qho}
+  set  atom 475 charge 0.425
+Setting atom values ...
+  1 settings made for charge
+
+  # bottom slab
+
+  # Modify the slab location to fit this script
+  displace_atoms all move 0 0 33.897898 units box
+Displacing atoms ...
+
+  create_atoms  1 single 1.318 5.558 -19.291176 # c
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable c3 equal ${natoms}
+  variable c3 equal 476
+  create_atoms  2 single 1.318 5.558 -20.391176 # h5
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable h3 equal ${natoms}
+  variable h3 equal 477
+  create_atoms  3 single 2.378 6.618 -18.591176 # o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o31 equal ${natoms}
+  variable o31 equal 478
+  create_atoms  3 single 0.258 4.498 -18.591176 # o
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable o32 equal ${natoms}
+  variable o32 equal 479
+
+  set  atom ${c3}  charge  0.731
+  set  atom 476  charge  0.731
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${h3}  charge -0.123
+  set  atom 477  charge -0.123
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o31} charge -0.804
+  set  atom 478 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+  set  atom ${o32} charge -0.804
+  set  atom 479 charge -0.804
+Setting atom values ...
+  1 settings made for charge
+
+  create_bonds  single/bond 1 ${c3} ${h3}
+  create_bonds  single/bond 1 476 ${h3}
+  create_bonds  single/bond 1 476 477
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds  single/bond 2 ${c3} ${o31}
+  create_bonds  single/bond 2 476 ${o31}
+  create_bonds  single/bond 2 476 478
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds  single/bond 2 ${c3} ${o32}
+  create_bonds  single/bond 2 476 ${o32}
+  create_bonds  single/bond 2 476 479
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds  single/angle 5 ${o31} ${c3} ${o32}
+  create_bonds  single/angle 5 478 ${c3} ${o32}
+  create_bonds  single/angle 5 478 476 ${o32}
+  create_bonds  single/angle 5 478 476 479
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds  single/angle 2 ${h3} ${c3} ${o32}
+  create_bonds  single/angle 2 477 ${c3} ${o32}
+  create_bonds  single/angle 2 477 476 ${o32}
+  create_bonds  single/angle 2 477 476 479
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  create_bonds  single/angle 2 ${h3} ${c3} ${o31}
+  create_bonds  single/angle 2 477 ${c3} ${o31}
+  create_bonds  single/angle 2 477 476 ${o31}
+  create_bonds  single/angle 2 477 476 478
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  create_bonds  single/improper 2 ${o31} ${h3} ${c3} ${o32}
+  create_bonds  single/improper 2 478 ${h3} ${c3} ${o32}
+  create_bonds  single/improper 2 478 477 ${c3} ${o32}
+  create_bonds  single/improper 2 478 477 476 ${o32}
+  create_bonds  single/improper 2 478 477 476 479
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  ## hydroxyl hydrogen creation
+
+  create_atoms  ${Ho} single 5.3 5.7 -17.456845 # ho/129
+  create_atoms  10 single 5.3 5.7 -17.456845 
+Created 1 atoms
+  using lattice units in orthogonal box = (0.239999 0.239999 -100) to (8.719999 8.719999 100)
+  create_atoms CPU = 0.000 seconds
+  variable  h3o equal ${natoms}
+  variable  h3o equal 480
+  set  atom ${h3o} charge ${qho}
+  set  atom 480 charge ${qho}
+  set  atom 480 charge 0.425
+Setting atom values ...
+  1 settings made for charge
+
+  group bads id ${c} ${h} ${o1} ${o2} ${c1} ${h1} ${o11} ${o12}
+  group bads id 461 ${h} ${o1} ${o2} ${c1} ${h1} ${o11} ${o12}
+  group bads id 461 462 ${o1} ${o2} ${c1} ${h1} ${o11} ${o12}
+  group bads id 461 462 463 ${o2} ${c1} ${h1} ${o11} ${o12}
+  group bads id 461 462 463 464 ${c1} ${h1} ${o11} ${o12}
+  group bads id 461 462 463 464 471 ${h1} ${o11} ${o12}
+  group bads id 461 462 463 464 471 472 ${o11} ${o12}
+  group bads id 461 462 463 464 471 472 473 ${o12}
+  group bads id 461 462 463 464 471 472 473 474
+8 atoms in group bads
+  displace_atoms bads move 2.12 2.12 0.0 units box
+Displacing atoms ...
+
+  group hads id ${h3o} ${h2o}
+  group hads id 480 ${h2o}
+  group hads id 480 470
+2 atoms in group hads
+  displace_atoms hads move -2.12 -2.12 0.0 units box
+Displacing atoms ...
+
+
+##
+## hydroxyl bonds and angles creation
+##
+
+  # hydroxyl bonds
+
+  group  ho type ${Ho}
+  group  ho type 10
+4 atoms in group ho
+  group  ob type ${Ob}
+  group  ob type 8
+264 atoms in group ob
+  create_bonds  many ho ob ${hydrox_bond} 1.0 1.65
+  create_bonds  many ho ob 5 1.0 1.65
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 2 2 29
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) command create_bonds, occasional
+      attributes: full, newton on
+      pair build: full/bin
+      stencil: full/bin/3d
+      bin: standard
+  (2) pair lj/cut/coul/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Added 4 bonds, new total = 16
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+  # hydroxyl angles
+
+  compute  nbonds ob property/atom nbonds
+  dump  nbonds ob custom 1 dump.nbonds id c_nbonds
+  variable  ob2oh atom c_nbonds>0
+  run  0
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 2 2 29
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 12.5 | 12.5 | 12.5 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0    49061.885    1559.5438    50621.429    198057.14 
+Loop time of 3.97e-07 on 1 procs for 0 steps with 480 atoms
+
+251.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Bond    | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 3.97e-07   |            |       |100.00
+
+Nlocal:            480 ave         480 max         480 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           8349 ave        8349 max        8349 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         238703 ave      238703 max      238703 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 238703
+Ave neighs/atom = 497.29792
+Ave special neighs/atom = 0.11666667
+Neighbor list builds = 0
+Dangerous builds = 0
+  group  ob2oh variable ob2oh
+4 atoms in group ob2oh
+  set  group ob2oh type ${Oh}
+  set  group ob2oh type 9
+Setting atom values ...
+  4 settings made for type
+  set  group ob2oh charge ${qoh}
+  set  group ob2oh charge -1
+Setting atom values ...
+  4 settings made for charge
+
+  group oh type ${Oh}
+  group oh type 9
+4 atoms in group oh
+  group fe type ${Fe2} ${Fe3}
+  group fe type 6 ${Fe3}
+  group fe type 6 7
+196 atoms in group fe
+  group feoh type ${Oh} ${Fe2} ${Fe3}
+  group feoh type 9 ${Fe2} ${Fe3}
+  group feoh type 9 6 ${Fe3}
+  group feoh type 9 6 7
+200 atoms in group feoh
+
+  # dummy bonds will be deleted after angle creation
+  fix  bonds all bond/create 1 ${Oh} ${Fe3} 2.1 ${dummy_bond} atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 ${Fe3} 2.1 ${dummy_bond} atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 7 2.1 ${dummy_bond} atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 7 2.1 6 atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 7 2.1 6 atype 6
+  run  100 # corresponds to max number of bonds created between fe3-oh
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 2 2 29
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut/coul/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) fix bond/create, occasional, copy from (1)
+      attributes: half, newton on
+      pair build: copy
+      stencil: none
+      bin: none
+Per MPI rank memory allocation (min/avg/max) = 12.81 | 12.81 | 12.81 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0    49040.306    1559.5438    50599.849    198022.84 
+     100            0    47859.036    1620.6229    49479.659    195277.21 
+WARNING: Bond/angle/dihedral extent > half of periodic box length (../domain.cpp:944)
+Loop time of 0.285576 on 1 procs for 100 steps with 480 atoms
+
+Performance: 15.127 ns/day, 1.587 hours/ns, 350.169 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.22372    | 0.22372    | 0.22372    |   0.0 | 78.34
+Bond    | 0.00023604 | 0.00023604 | 0.00023604 |   0.0 |  0.08
+Neigh   | 0.011228   | 0.011228   | 0.011228   |   0.0 |  3.93
+Comm    | 0.002514   | 0.002514   | 0.002514   |   0.0 |  0.88
+Output  | 0.0055016  | 0.0055016  | 0.0055016  |   0.0 |  1.93
+Modify  | 0.041867   | 0.041867   | 0.041867   |   0.0 | 14.66
+Other   |            | 0.0005148  |            |       |  0.18
+
+Nlocal:            480 ave         480 max         480 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           8349 ave        8349 max        8349 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         238667 ave      238667 max      238667 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 238667
+Ave neighs/atom = 497.22292
+Ave special neighs/atom = 0.26666667
+Neighbor list builds = 3
+Dangerous builds = 0
+  fix  bonds all bond/create 1 ${Oh} ${Fe2} 2.1 ${dummy_bond} atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 ${Fe2} 2.1 ${dummy_bond} atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 6 2.1 ${dummy_bond} atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 6 2.1 6 atype ${hydrox_angle}
+  fix  bonds all bond/create 1 9 6 2.1 6 atype 6
+  run  100 # corresponds to max number of bonds created between fe2-oh
+WARNING: No fixes with time integration, atoms won't move (../verlet.cpp:60)
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 2 2 29
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut/coul/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) fix bond/create, occasional, copy from (1)
+      attributes: half, newton on
+      pair build: copy
+      stencil: none
+      bin: none
+WARNING: Inconsistent image flags (../domain.cpp:823)
+WARNING: Bond/angle/dihedral extent > half of periodic box length (../domain.cpp:944)
+Per MPI rank memory allocation (min/avg/max) = 12.96 | 12.96 | 12.96 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+     100            0    47859.036    1620.6229    49479.659    195277.21 
+     200            0    47859.036    1620.6229    49479.659    195277.21 
+WARNING: Bond/angle/dihedral extent > half of periodic box length (../domain.cpp:944)
+Loop time of 0.270252 on 1 procs for 100 steps with 480 atoms
+
+Performance: 15.985 ns/day, 1.501 hours/ns, 370.025 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.22109    | 0.22109    | 0.22109    |   0.0 | 81.81
+Bond    | 0.00023353 | 0.00023353 | 0.00023353 |   0.0 |  0.09
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0022808  | 0.0022808  | 0.0022808  |   0.0 |  0.84
+Output  | 0.0054438  | 0.0054438  | 0.0054438  |   0.0 |  2.01
+Modify  | 0.040689   | 0.040689   | 0.040689   |   0.0 | 15.06
+Other   |            | 0.0005186  |            |       |  0.19
+
+Nlocal:            480 ave         480 max         480 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           8349 ave        8349 max        8349 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         238667 ave      238667 max      238667 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 238667
+Ave neighs/atom = 497.22292
+Ave special neighs/atom = 0.26666667
+Neighbor list builds = 0
+Dangerous builds = 0
+  unfix  bonds
+  # remove unneccessary fe-oh-fe angles and dummy fe-oh bonds
+  delete_bonds  all bond ${dummy_bond} remove
+  delete_bonds  all bond 6 remove
+System init for delete_bonds ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 2 2 29
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Deleting bonds ...
+  16 total bonds, 16 turned on, 0 turned off
+  36 total angles, 36 turned on, 0 turned off
+  0 total dihedrals, 0 turned on, 0 turned off
+  4 total impropers, 4 turned on, 0 turned off
+  delete_bonds  feoh angle ${hydrox_angle} remove
+  delete_bonds  feoh angle 6 remove
+System init for delete_bonds ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+Deleting bonds ...
+  16 total bonds, 16 turned on, 0 turned off
+  24 total angles, 24 turned on, 0 turned off
+  0 total dihedrals, 0 turned on, 0 turned off
+  4 total impropers, 4 turned on, 0 turned off
+
+  ##
+  ## charge neutralization
+  ##
+
+  # via changing the charge (and type) of one Fe(II) to Fe(III) per formate
+#  group  fe2 type 6
+#  set  group fe2 type/subset 7 4 ${rand}
+#  set  type 7 charge ${q3}
+#  group  fe2 delete
+
+  # sanity check and replication
+  variable  qtot equal charge(all)
+  print  "total charge of the system : ${qtot}"
+total charge of the system : -7.28861415666415e-14
+
+  variable zmax equal bound(all,zmax)+${boffset}
+  variable zmax equal bound(all,zmax)+12
+  variable zmin equal bound(all,zmin)-${boffset}
+  variable zmin equal bound(all,zmin)-12
+  change_box all z final ${zmin} ${zmax} units box
+  change_box all z final -32.391176 ${zmax} units box
+  change_box all z final -32.391176 66.805898 units box
+Changing box ...
+  orthogonal box = (0.239999 0.239999 -32.391176) to (8.719999 8.719999 66.805898)
+
+  write_data  001-dbt_1x1_${layer}L_fa_int_full_ordered.data
+  write_data  001-dbt_1x1_65L_fa_int_full_ordered.data
+System init for write_data ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+
+  replicate  3 3 1
+Replicating atoms ...
+  orthogonal box = (0.239999 0.239999 -32.391176) to (25.679999 25.679999 66.805898)
+  1 by 1 by 1 MPI processor grid
+  4320 atoms
+  144 bonds
+  216 angles
+  36 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0.8333333333333334
+     3 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     2 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+  replicate CPU = 0.002 seconds
+##########
+#  set	atom * image 0 0 0
+
+  write_data  001-dbt_3x3_${layer}L_fa_int_full_ordered.data
+  write_data  001-dbt_3x3_65L_fa_int_full_ordered.data
+System init for write_data ...
+  generated 45 of 45 mixed pair_coeff terms from arithmetic mixing rule
+
+  clear
+
+next layer
+jump SELF loop
+Total wall time: 0:00:00
