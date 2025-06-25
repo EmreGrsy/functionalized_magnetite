@@ -24,7 +24,7 @@ This repository contains scripts used for modelling and investigating functional
 │   ├── 2_bond_react_int_run/           # BOND_REACT run
 
 221215_formate_on_magnetite_with_bulk/  
-├── 1_with_bulk/                        # Formate on magnetite with bulk layers (not published)
+├── 1_with_bulk/                        # Formate on magnetite with bulk layers 
 │   ├── 2_results/                      # Analysis results 
 
 231120_formate_on_both_sides/           
@@ -42,17 +42,16 @@ This repository contains scripts used for modelling and investigating functional
 │   ├── 1_gen/                            
 │   ├── 2_results/                       
 
-├── 2_charge_to_extra_hydroxide/         # Extra hydroxide charge analysis  (not published)
-│   ├── 3_gen_slab/                      # Slab generation scripts (not published)
+├── 2_charge_to_extra_hydroxide/         # Extra hydroxide charge analysis 
+│   ├── 3_gen_slab/                      # Slab generation scripts 
 
 231214_65L_formate_ordered/              
-├── 1_analyze_surface_slab_41L/          # Surface on 41-layer bulk (not published)
-│   ├── 2_65_layered_surface/            # Surface on 65-layer bulk (not published)
-
+├── 1_analyze_surface_slab_41L/          # Surface on 41-layer bulk 
+│   ├── 2_65_layered_surface/            # Surface on 65-layer bulk 
 240913_trimeron_analysis/
 ├── 1_RDF/                               # RDF analysis
 ├── 2_entropy/                           # Entropy calculations
 │   ├── 3_results/                       # Entropy results
 
-241008_trimeron_analysis/                # Additional trimeron analysis (not published)
+241008_trimeron_analysis/                # Additional trimeron analysis 
 ```
