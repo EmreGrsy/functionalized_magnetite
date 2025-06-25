@@ -1,6 +1,6 @@
 # Functionalized Magnetite Surfaces
 
-[![DOI](https://img.shields.io/badge/DOI-10.1021/acs.jpclett.3c01290-blue)]([https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679)](https://pubs.acs.org/doi/10.1021/acs.jpclett.5c00679)  
+[![DOI](https://img.shields.io/badge/DOI-10.1021/acs.jpclett.3c01290-blue)](https://pubs.acs.org/doi/10.1021/acs.jpclett.5c00679)]
 
 This repository contains scripts and data used in the research paper [**Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States**](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.5c00679). 
 
