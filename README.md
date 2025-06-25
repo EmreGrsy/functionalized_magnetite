@@ -8,7 +8,7 @@ This repository contains scripts and data used in the research paper [**Atomisti
 
 ## Overview
 
-This repository contains production and analysis scripts used in the investigation of functionalizing and analyzing magnetite (001) surface using oxidations state swaps. It includes surface adsorption modeling, calculating binding site preferences, exploring different surface terminations with, invesitgating surfaces with explicit bulk regions, investigating trimerons and the entropic contributions. The repository also contains scripts for reaction pathway sampling using bond_react, which ended up not being published but shared here.
+This repository contains scripts used in the investigation of functionalizing and analyzing magnetite (001) surfaces using oxidations state swaps. It includes the surface adsorption mode, binding site preference calculations, exploring different surface terminations with with explicit bulk regions, investigating trimerons and the entropic contributions. The repository also contains scripts for reaction pathway sampling using bond_react, which ended up not being published.
 
 ## Repository Structure
 ```
