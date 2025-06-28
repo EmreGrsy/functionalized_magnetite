@@ -54,4 +54,21 @@ This repository contains scripts used for modelling and investigating functional
 │   ├── 3_results/                       # Entropy results
 
 241008_trimeron_analysis/                # Additional trimeron analysis 
+
+```
+## Related Publications  
+If you use this repository, please cite the original paper:  
+```bibtex
+@article{Grsoy2025,
+  title = {Atomistic Modeling of Functionalized Magnetite Surfaces with Oxidation States},
+  ISSN = {1948-7185},
+  url = {http://dx.doi.org/10.1021/acs.jpclett.5c00679},
+  DOI = {10.1021/acs.jpclett.5c00679},
+  journal = {The Journal of Physical Chemistry Letters},
+  publisher = {American Chemical Society (ACS)},
+  author = {G\"{u}rsoy,  Emre and Meißner,  Robert H. and Vonbun-Feldbauer,  Gregor B.},
+  year = {2025},
+  month = jun,
+  pages = {6765–6770}
+}
 ```
